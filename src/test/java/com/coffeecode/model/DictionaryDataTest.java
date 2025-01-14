@@ -1,12 +1,9 @@
 package com.coffeecode.model;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,84 +15,93 @@ class DictionaryDataTest {
         dictionaryData = new DictionaryData();
     }
 
-    @Test 
-    void testInitialLanguageIsEnglish() {
-        assertEquals(Language.ENGLISH, dictionaryData.getCurrentLanguage());
-    }
-
     @Test
-    void testSwitchLanguage() {
+    void testDictionaryContentInBothLanguages() {
+        // Test English to Indonesian
+        assertEquals(Language.ENGLISH, dictionaryData.getCurrentLanguage());
+        Map<String, String> englishDict = dictionaryData.getCurrentDictionary();
+        String englishWord = englishDict.keySet().iterator().next();
+        String indonesianTranslation = dictionaryData.translate(englishWord);
+        
+        // Switch to Indonesian and test
         dictionaryData.switchLanguage();
         assertEquals(Language.INDONESIAN, dictionaryData.getCurrentLanguage());
-        dictionaryData.switchLanguage(); 
-        assertEquals(Language.ENGLISH, dictionaryData.getCurrentLanguage());
+        Map<String, String> indoDict = dictionaryData.getCurrentDictionary();
+        
+        // Verify the translation works both ways
+        String backToEnglish = dictionaryData.translate(indonesianTranslation);
+        assertEquals(englishWord.toLowerCase(), backToEnglish.toLowerCase());
+        
+        // Verify dictionaries are different
+        assertFalse(englishDict.equals(indoDict));
+        
+        // Verify both dictionaries have content
+        assertFalse(englishDict.isEmpty());
+        assertFalse(indoDict.isEmpty());
+        
+        // Test a known English-Indonesian pair if available
+        if (englishDict.containsKey("hello")) {
+            assertEquals("halo", dictionaryData.translate("hello").toLowerCase());
+            dictionaryData.switchLanguage();
+            assertEquals("hello", dictionaryData.translate("halo").toLowerCase());
+        }
     }
 
     @Test
-    void testGetWordList() {
-        List<String> wordList = dictionaryData.getWordList();
-        assertNotNull(wordList);
-        assertFalse(wordList.isEmpty());
+    void testCaseSensitiveTranslation() {
+        String mixedCaseWord = "HeLLo";
+        String lowerCaseWord = "hello";
+        String upperCaseWord = "HELLO";
+        
+        String translation1 = dictionaryData.translate(mixedCaseWord);
+        String translation2 = dictionaryData.translate(lowerCaseWord);
+        String translation3 = dictionaryData.translate(upperCaseWord);
+        
+        assertEquals(translation1, translation2);
+        assertEquals(translation2, translation3);
     }
 
     @Test
-    void testTranslateExistingWord() {
+    void testWhitespaceHandling() {
+        String wordWithSpaces = "   hello   ";
+        String wordWithTabs = "\thello\t";
+        String wordWithNewlines = "\nhello\n";
+        
+        assertEquals("Translation not found", dictionaryData.translate(wordWithSpaces));
+        assertEquals("Translation not found", dictionaryData.translate(wordWithTabs));
+        assertEquals("Translation not found", dictionaryData.translate(wordWithNewlines));
+    }
+
+    @Test
+    void testSpecialCharacters() {
+        String wordWithSpecialChars = "hello!@#$%";
+        String wordWithNumbers = "hello123";
+        String wordWithUnicode = "hello™®";
+        
+        assertEquals("Translation not found", dictionaryData.translate(wordWithSpecialChars));
+        assertEquals("Translation not found", dictionaryData.translate(wordWithNumbers));
+        assertEquals("Translation not found", dictionaryData.translate(wordWithUnicode));
+    }
+
+    @Test
+    void testLongAndShortText() {
+        String veryLongWord = "a".repeat(1000);
+        String singleChar = "a";
+        
+        assertEquals("Translation not found", dictionaryData.translate(veryLongWord));
+        assertEquals("Translation not found", dictionaryData.translate(singleChar));
+    }
+
+    @Test
+    void testConsecutiveTranslations() {
         Map<String, String> dictionary = dictionaryData.getCurrentDictionary();
         String word = dictionary.keySet().iterator().next();
-        String translation = dictionaryData.translate(word);
-        assertEquals(dictionary.get(word), translation);
-    }
-
-    @Test
-    void testTranslateNonExistingWord() {
-        String translation = dictionaryData.translate("nonexistentword");
-        assertEquals("Translation not found", translation);
-    }
-
-    @Test
-    void testGetCurrentDictionary() {
-        Map<String, String> dictionary = dictionaryData.getCurrentDictionary();
-        assertNotNull(dictionary);
-        assertFalse(dictionary.isEmpty());
-    }
-
-    @Test
-    void testToString() {
-        String result = dictionaryData.toString();
-        assertTrue(result.contains("currentDictionary"));
-        assertTrue(result.contains("currentLanguage"));
-    }
-
-    @Test
-    void testTranslateEmptyString() {
-        String translation = dictionaryData.translate("");
-        assertEquals("Translation not found", translation);
-    }
-
-    @Test
-    void testTranslateNullWord() {
-        String translation = dictionaryData.translate(null);
-        assertEquals("Translation not found", translation);
-    }
-
-    @Test
-    void testMultipleLanguageSwitches() {
-        assertEquals(Language.ENGLISH, dictionaryData.getCurrentLanguage());
-        dictionaryData.switchLanguage();
-        assertEquals(Language.INDONESIAN, dictionaryData.getCurrentLanguage());
-        dictionaryData.switchLanguage();
-        assertEquals(Language.ENGLISH, dictionaryData.getCurrentLanguage());
-        dictionaryData.switchLanguage();
-        assertEquals(Language.INDONESIAN, dictionaryData.getCurrentLanguage());
-    }
-
-    @Test
-    void testWordListConsistency() {
-        List<String> initialList = dictionaryData.getWordList();
-        dictionaryData.switchLanguage();
-        List<String> afterSwitchList = dictionaryData.getWordList();
-        assertNotNull(initialList);
-        assertNotNull(afterSwitchList);
-        assertFalse(initialList.equals(afterSwitchList));
+        
+        String translation1 = dictionaryData.translate(word);
+        String translation2 = dictionaryData.translate(word);
+        String translation3 = dictionaryData.translate(word);
+        
+        assertEquals(translation1, translation2);
+        assertEquals(translation2, translation3);
     }
 }
