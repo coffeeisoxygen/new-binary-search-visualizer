@@ -70,28 +70,32 @@ public class SearchStepFormatter {
     public String formatSearchStep(SearchStepInfo info) {
         return String.format("""
             %sStep %d:%s
-            %slow[%d]>%s - mid[%d]>%s - high[%d]>%s%s
+            %s[%d]%-15s < [%d]%-15s > [%d]%-15s%s
             """,
-                ANSI_YELLOW, info.step(), ANSI_RESET,
-                ANSI_GREEN,
-                info.low(), info.lowWord(),
-                info.mid(), info.midWord(),
-                info.high(), info.highWord(),
-                ANSI_RESET);
+            ANSI_YELLOW, info.step(), ANSI_RESET,
+            ANSI_GREEN,
+            info.low(), info.lowWord(),
+            info.mid(), info.midWord(),
+            info.high(), info.highWord(),
+            ANSI_RESET
+        );
     }
 
     public String formatSearchSummary(SearchResult result, int comparisons, double timeMs) {
         return String.format("""
-            %s============Search Summary===================
-            Search completed in:
-            - %d comparisons
-            - %.2f ms
-            Result: %s
-            =============================================%s
+            %s=============Search Summary=============
+            Result    : %s
+            Steps     : %d comparisons
+            Time      : %.2f ms
+            =======================================%s
             """,
-                ANSI_BLUE,
-                comparisons, timeMs,
-                result.found() ? "Found: " + result.word() + " → " + result.translation() : "Not found: " + result.word(),
-                ANSI_RESET);
+            ANSI_BLUE,
+            result.found() ? 
+                String.format("Found '%s' → '%s'", result.word(), result.translation()) :
+                String.format("'%s' not found", result.word()),
+            comparisons,
+            timeMs,
+            ANSI_RESET
+        );
     }
 }

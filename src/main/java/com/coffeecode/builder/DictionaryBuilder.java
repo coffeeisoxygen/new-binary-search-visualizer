@@ -103,8 +103,9 @@ public class DictionaryBuilder {
         this.jsonService = jsonService != null ? jsonService : new JsonService();
         this.fileService = fileService != null ? fileService
                 : new FileService(dictionaryPath, maxFileSize);
+        // Initialize with DefaultSearchObserver - will be replaced by visualization later
         this.searchService = searchService != null ? searchService
-                : new SearchService(new BinarySearch(searchObserver));
+                : new SearchService(new BinarySearch(new DefaultSearchObserver()));
         this.sortService = sortService != null ? sortService : new SortService();
     }
 }

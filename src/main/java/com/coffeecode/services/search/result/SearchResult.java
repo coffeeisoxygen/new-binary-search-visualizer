@@ -3,10 +3,16 @@ package com.coffeecode.services.search.result;
 public record SearchResult(
         boolean found,
         String word,
-        String translation) {
+        String translation,
+        int comparisons,
+        double timeMs) {
 
-    public SearchResult   {
-        word = (word != null) ? word : "";
-        translation = (translation != null) ? translation : "";
+    public SearchResult     {
+        if (word == null) {
+            word = "";
+        }
+        if (translation == null) {
+            translation = "";
+        }
     }
 }

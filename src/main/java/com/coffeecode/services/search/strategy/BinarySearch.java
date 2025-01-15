@@ -29,7 +29,7 @@ public class BinarySearch implements SearchStrategy {
     public SearchResult search(String word, List<Vocabulary> data, Language language) {
         if (data.isEmpty()) {
             logger.debug("Empty dictionary, returning not found for: {}", word);
-            return new SearchResult(false, word, "");
+            return createNotFoundResult(word, 0, System.nanoTime());
         }
 
         logger.debug("Starting binary search for '{}' in {} dictionary", word, language);
@@ -48,7 +48,6 @@ public class BinarySearch implements SearchStrategy {
             Vocabulary current = data.get(mid);
             String currentWord = language.getWord(current);
 
-            // Notify observer of current step
             observer.onSearchStep(new SearchStepInfo(
                     comparisons,
                     left, language.getWord(data.get(left)),
@@ -60,10 +59,7 @@ public class BinarySearch implements SearchStrategy {
 
             int comparison = currentWord.compareToIgnoreCase(word);
             if (comparison == 0) {
-                SearchResult result = createFoundResult(current, language);
-                observer.onSearchComplete(result, comparisons,
-                        (System.nanoTime() - startTime) / 1_000_000.0);
-                return result;
+                return createFoundResult(current, language, comparisons, startTime);
             }
             if (comparison < 0) {
                 left = mid + 1;
@@ -72,21 +68,28 @@ public class BinarySearch implements SearchStrategy {
             }
         }
 
-        SearchResult result = createNotFoundResult(word);
-        observer.onSearchComplete(result, comparisons,
-                (System.nanoTime() - startTime) / 1_000_000.0);
-        return result;
+        return createNotFoundResult(word, comparisons, startTime);
     }
 
-    private SearchResult createFoundResult(Vocabulary vocab, Language language) {
+    private SearchResult createFoundResult(Vocabulary vocab, Language language,
+            int comparisons, long startTime) {
         return new SearchResult(
                 true,
                 language.getWord(vocab),
-                language.getOpposite().getWord(vocab)
+                language.getOpposite().getWord(vocab),
+                comparisons,
+                (System.nanoTime() - startTime) / 1_000_000.0
         );
     }
 
-    private SearchResult createNotFoundResult(String word) {
-        return new SearchResult(false, word, "");
+    private SearchResult createNotFoundResult(String word,
+            int comparisons, long startTime) {
+        return new SearchResult(
+                false,
+                word,
+                "",
+                comparisons,
+                (System.nanoTime() - startTime) / 1_000_000.0
+        );
     }
 }
