@@ -6,13 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coffeecode.exception.DictionaryException;
-import com.coffeecode.model.Dictionary;
-import com.coffeecode.model.FileService;
-import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
-import com.coffeecode.search.BinarySearch;
 import com.coffeecode.search.SearchResult;
-import com.coffeecode.search.SearchStrategy;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class App {
@@ -24,12 +19,13 @@ public class App {
     private static final String ANSI_BLUE = "\u001B[34m";
 
     public static void main(String[] args) throws DictionaryException {
-        // Initialize components
-        SearchStrategy searchStrategy = new BinarySearch();
-        FileService fileService = new FileService();
-        IDictionary dictionary = new Dictionary(searchStrategy, fileService);
-        DictionaryViewModel viewModel = new DictionaryViewModel(dictionary);
+        DictionaryManager manager = new DictionaryManager.Builder()
+            .withDictionaryPath("src/main/resources/vocabulary.json")
+            .withMaxFileSize(10 * 1024 * 1024)
+            .build();
 
+        DictionaryViewModel viewModel = manager.getViewModel();
+        
         // Load dictionary
         try {
             viewModel.loadDictionary();

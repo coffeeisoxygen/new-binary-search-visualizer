@@ -13,6 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
+import com.coffeecode.services.json.JsonService;
 
 class JsonServiceTest {
 

@@ -1,8 +1,9 @@
-package com.coffeecode.model;
+package com.coffeecode.services.file;
 
 import java.util.List;
 
 import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.model.Vocabulary;
 
 public interface IFileService {
 

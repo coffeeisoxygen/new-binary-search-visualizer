@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
+import com.coffeecode.services.file.FileService;
+import com.coffeecode.services.json.IJsonService;
 
 class FileServiceTest {
 

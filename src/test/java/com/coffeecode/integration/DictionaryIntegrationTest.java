@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.coffeecode.model.Dictionary;
-import com.coffeecode.model.FileService;
-import com.coffeecode.model.IFileService;
-import com.coffeecode.model.IJsonService;
-import com.coffeecode.model.JsonService;
 import com.coffeecode.model.Language;
 import com.coffeecode.search.BinarySearch;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
+import com.coffeecode.services.file.FileService;
+import com.coffeecode.services.file.IFileService;
+import com.coffeecode.services.json.IJsonService;
+import com.coffeecode.services.json.JsonService;
 
 class DictionaryIntegrationTest {
     private static final String TEST_RESOURCES = "src/test/resources/";

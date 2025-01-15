@@ -15,6 +15,7 @@ import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
+import com.coffeecode.services.file.IFileService;
 
 class DictionaryTest {
 

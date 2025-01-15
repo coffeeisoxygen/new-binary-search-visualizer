@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.services.json;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
+import com.coffeecode.model.Vocabulary;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

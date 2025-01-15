@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.services.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
+import com.coffeecode.model.Vocabulary;
+import com.coffeecode.services.json.IJsonService;
+import com.coffeecode.services.json.JsonService;
 
 public class FileService implements IFileService {
 
