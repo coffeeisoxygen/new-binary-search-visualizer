@@ -2,7 +2,6 @@ package com.coffeecode.viewmodel;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.coffeecode.model.DictionaryModel;
 import com.coffeecode.model.Vocabulary;
@@ -24,15 +23,15 @@ public class DictionaryViewModel {
 
     public List<String> getEnglishWords() {
         return model.getVocabularies().stream()
-                .map(Vocabulary::english)
+                .map(Vocabulary::getEnglish)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList(); // Returns an unmodifiable List
     }
 
     public List<String> getIndonesianWords() {
         return model.getVocabularies().stream()
-                .map(Vocabulary::indonesian)
+                .map(Vocabulary::getIndonesian)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList(); // Returns an unmodifiable List
     }
 }

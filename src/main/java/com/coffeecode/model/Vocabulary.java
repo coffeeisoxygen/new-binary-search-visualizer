@@ -12,4 +12,13 @@ public record Vocabulary(String english, String indonesian) {
             throw new IllegalArgumentException("Indonesian word cannot be empty");
         }
     }
+
+    // getters
+    public String getEnglish() {
+        return english;
+    }
+
+    public String getIndonesian() {
+        return indonesian;
+    }
 }
