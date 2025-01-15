@@ -1,79 +1,84 @@
 package com.coffeecode.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
 
 class FileServiceTest {
-    @Mock private IJsonService jsonService;
-    private FileService fileService;
-    @TempDir File tempDir;
 
-    private static final String VALID_JSON = """
-            {
-                "vocabulary": [
-                    {"english": "hello", "indonesian": "halo"},
-                    {"english": "world", "indonesian": "dunia"}
-                ]
-            }
-            """;
+    private static final String TEST_RESOURCES = "src/test/resources/";
+    private static final String TEST_VOCABULARY = TEST_RESOURCES + "test-vocabulary.json";
+    private static final String EMPTY_VOCABULARY = TEST_RESOURCES + "empty-vocabulary.json";
+    private static final String FULL_VOCABULARY = TEST_RESOURCES + "vocabulary.json";
+
+    private IJsonService jsonService;
+    private FileService fileService;
+    private List<Vocabulary> testVocabularies;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        fileService = new FileService("test-dict.json", 1024 * 1024, jsonService);
+        jsonService = mock(IJsonService.class);
+        fileService = new FileService(TEST_VOCABULARY, 1024 * 1024, jsonService);
+        testVocabularies = Arrays.asList(
+                new Vocabulary("cat", "kucing"),
+                new Vocabulary("dog", "anjing")
+        );
+    }
+
+    @Test
+    void loadVocabularies_WithValidPath_ShouldReturnVocabularies() throws DictionaryException {
+        when(jsonService.parseVocabularyFile(any())).thenReturn(testVocabularies);
+        List<Vocabulary> result = fileService.loadVocabularies(TEST_VOCABULARY);
+
+        assertEquals(2, result.size());
+        verify(jsonService).parseVocabularyFile(any());
     }
 
     @Test
     void loadVocabularies_WithNullPath_ShouldThrowException() {
-        var exception = assertThrows(
-            DictionaryException.class,
-            () -> fileService.loadVocabularies(null)
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> fileService.loadVocabularies(null)
         );
         assertEquals(ErrorCode.FILE_NOT_FOUND, exception.getErrorCode());
     }
 
     @Test
     void loadVocabularies_WithEmptyPath_ShouldThrowException() {
-        var exception = assertThrows(
-            DictionaryException.class,
-            () -> fileService.loadVocabularies("  ")
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> fileService.loadVocabularies("  ")
         );
         assertEquals(ErrorCode.FILE_NOT_FOUND, exception.getErrorCode());
     }
 
     @Test
     void loadVocabularies_WithNonexistentFile_ShouldThrowException() {
-        var exception = assertThrows(
-            DictionaryException.class,
-            () -> fileService.loadVocabularies("nonexistent.json")
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> fileService.loadVocabularies("nonexistent.json")
         );
         assertEquals(ErrorCode.FILE_NOT_FOUND, exception.getErrorCode());
     }
 
     @Test
-    void loadDefaultDictionary_WhenFileNotFound_ShouldThrowException() {
-        var exception = assertThrows(
-            DictionaryException.class,
-            () -> fileService.loadDefaultDictionary()
-        );
-        assertEquals(ErrorCode.FILE_NOT_FOUND, exception.getErrorCode());
-    }
+    void loadDefaultDictionary_ShouldLoadFromDefaultPath() throws DictionaryException {
+        when(jsonService.parseVocabularyFile(any())).thenReturn(testVocabularies);
+        List<Vocabulary> result = fileService.loadDefaultDictionary();
 
-    private File createTestFile(String filename, String content) throws IOException {
-        File testFile = new File(tempDir, filename);
-        Files.writeString(testFile.toPath(), content);
-        return testFile;
+        assertNotNull(result);
+        verify(jsonService).parseVocabularyFile(any());
     }
 }
