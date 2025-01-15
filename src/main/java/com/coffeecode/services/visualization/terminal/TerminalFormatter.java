@@ -99,4 +99,8 @@ public class TerminalFormatter {
         );
     }
 
+    public char[] formatError(String string) {
+        return string.toCharArray();
+    }
+
 }

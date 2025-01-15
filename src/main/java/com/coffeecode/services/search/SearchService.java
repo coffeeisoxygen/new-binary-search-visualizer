@@ -11,13 +11,14 @@ import com.coffeecode.services.search.result.SearchResult;
 import com.coffeecode.services.search.strategy.BinarySearch;
 import com.coffeecode.services.search.strategy.SearchStrategy;
 import com.coffeecode.services.visualization.observer.DefaultSearchObserver;
+import com.coffeecode.services.visualization.observer.ISearchConfigurable;
 import com.coffeecode.services.visualization.observer.SearchObserver;
 
-public class SearchService implements ISearchService {
+public class SearchService implements ISearchService, ISearchConfigurable {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
     private final SearchStrategy strategy;
-    private SearchObserver observer;
+    private SearchObserver observer = new DefaultSearchObserver(); // Default observer
 
     public SearchService(SearchStrategy strategy) {
         this.strategy = strategy;
@@ -43,6 +44,11 @@ public class SearchService implements ISearchService {
         if (strategy instanceof BinarySearch binarySearch) {
             binarySearch.setObserver(this.observer);
         }
+    }
+
+    @Override
+    public void configureSearch(SearchObserver observer) {
+        this.observer = observer;
     }
 
     private void validateSearchParams(String word, List<Vocabulary> data, Language language) {

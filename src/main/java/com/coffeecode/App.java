@@ -1,7 +1,5 @@
 package com.coffeecode;
 
-import java.util.Scanner;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,16 +8,19 @@ import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
 import com.coffeecode.services.visualization.observer.SearchObserver;
 import com.coffeecode.services.visualization.terminal.TerminalFormatter;
+import com.coffeecode.services.visualization.terminal.TerminalHandler;
 import com.coffeecode.services.visualization.terminal.TerminalVisualizer;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class App {
 
     private static final Logger logger = LoggerFactory.getLogger(App.class);
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final TerminalFormatter formatter = new TerminalFormatter();
-    private static final String ANSI_YELLOW = "\u001B[33m";
-    private static final String ANSI_RESET = null;
+    private static final TerminalHandler terminal;
+
+    static {
+        TerminalFormatter formatter = new TerminalFormatter();
+        terminal = new TerminalHandler(formatter);
+    }
 
     public static void main(String[] args) {
         try {
@@ -37,65 +38,31 @@ public class App {
     }
 
     private static void runInteractiveSearch(DictionaryViewModel viewModel) {
-        // Display welcome screen
-        System.out.println(formatter.formatWelcomeScreen(
+        terminal.displayWelcomeScreen(
                 viewModel.getWordsByLanguage(Language.ENGLISH),
                 viewModel.getWordsByLanguage(Language.INDONESIAN)
-        ));
+        );
 
-        while (true) {
-            // Get search word
-            System.out.print(formatter.formatInputPrompt());
-            String word = getValidInput();
-            if ("quit".equalsIgnoreCase(word)) {
-                break;
+        boolean continueSearch = true;
+        while (continueSearch) {
+            String word = terminal.getSearchWord();
+            Language language = terminal.getSearchLanguage();
+
+            if ("quit".equalsIgnoreCase(word) || language == null) {
+                continueSearch = false;
+            } else {
+                performSearch(viewModel, word, language);
             }
-
-            // Get language choice
-            System.out.println(formatter.formatLanguagePrompt());
-            Language language = getValidLanguage();
-            if (language == null) {
-                break;
-            }
-
-            // Perform search with visualization
-            demonstrateSearch(viewModel, word, language);
         }
     }
 
-    private static String getValidInput() {
-        String input;
-        while (true) {
-            input = scanner.nextLine().trim();
-            if ("quit".equalsIgnoreCase(input)) {
-                return input;
-            }
-            if (input.matches("[a-zA-Z\s-]+")) {
-                return input;
-            }
-            System.out.println(ANSI_YELLOW + "Invalid input. Use only letters, spaces, and hyphens." + ANSI_RESET);
+    private static void performSearch(DictionaryViewModel viewModel, String word, Language language) {
+        try {
+            SearchObserver visualizer = new TerminalVisualizer(word, language);
+            viewModel.configureSearch(visualizer);
+            viewModel.search(word, language);
+        } catch (DictionaryException e) {
+            logger.error("Search failed: {}", e.getMessage());
         }
-    }
-
-    private static Language getValidLanguage() {
-        while (true) {
-            String choice = scanner.nextLine().trim();
-            if ("quit".equalsIgnoreCase(choice)) {
-                return null;
-            }
-            if ("1".equals(choice)) {
-                return Language.ENGLISH;
-            }
-            if ("2".equals(choice)) {
-                return Language.INDONESIAN;
-            }
-            System.out.println(ANSI_YELLOW + "Invalid choice. Enter 1 for English or 2 for Indonesian." + ANSI_RESET);
-        }
-    }
-
-    private static void demonstrateSearch(DictionaryViewModel viewModel, String word, Language language) {
-        SearchObserver visualizer = new TerminalVisualizer(word, language);
-        viewModel.configureSearch(visualizer);
-        viewModel.search(word, language);
     }
 }
