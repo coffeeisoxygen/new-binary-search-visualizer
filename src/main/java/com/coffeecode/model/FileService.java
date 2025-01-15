@@ -15,25 +15,23 @@ public class FileService implements IFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
     private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
-
+    private final String defaultDictionaryPath;
     private final ObjectMapper objectMapper;
 
     public FileService() {
+        this(DEFAULT_DICTIONARY_PATH);
+    }
+
+    // Constructor for testing
+    public FileService(String defaultDictionaryPath) {
+        this.defaultDictionaryPath = defaultDictionaryPath;
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
     public List<Vocabulary> loadDefaultDictionary() throws DictionaryException {
-        logger.info("Loading default dictionary from: {}", DEFAULT_DICTIONARY_PATH);
-        File defaultFile = new File(DEFAULT_DICTIONARY_PATH);
-
-        if (!defaultFile.exists()) {
-            String errorMessage = String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH);
-            logger.error(errorMessage);
-            throw new DictionaryException(errorMessage);
-        }
-
-        return loadVocabularies(DEFAULT_DICTIONARY_PATH);
+        logger.info("Loading default dictionary from: {}", defaultDictionaryPath);
+        return loadVocabularies(defaultDictionaryPath);
     }
 
     @Override
