@@ -18,11 +18,15 @@ public class SearchService implements ISearchService, ISearchConfigurable {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
     private final SearchStrategy strategy;
-    private SearchObserver observer = new DefaultSearchObserver(); // Default observer
+    private SearchObserver observer;
 
     public SearchService(SearchStrategy strategy) {
         this.strategy = strategy;
         this.observer = new DefaultSearchObserver();
+        // Initialize strategy with default observer
+        if (strategy instanceof BinarySearch binarySearch) {
+            binarySearch.setObserver(this.observer);
+        }
     }
 
     @Override
@@ -48,7 +52,12 @@ public class SearchService implements ISearchService, ISearchConfigurable {
 
     @Override
     public void configureSearch(SearchObserver observer) {
-        this.observer = observer;
+        this.observer = observer != null ? observer : new DefaultSearchObserver();
+        // Ensure strategy gets the observer
+        if (strategy instanceof BinarySearch binarySearch) {
+            logger.debug("Configuring search observer: {}", observer.getClass().getSimpleName());
+            binarySearch.setObserver(this.observer);
+        }
     }
 
     private void validateSearchParams(String word, List<Vocabulary> data, Language language) {

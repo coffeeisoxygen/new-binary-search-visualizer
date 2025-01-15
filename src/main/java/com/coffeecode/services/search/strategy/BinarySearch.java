@@ -14,19 +14,21 @@ import com.coffeecode.services.visualization.observer.SearchObserver;
 
 public class BinarySearch implements SearchStrategy {
 
-    private SearchObserver observer;
     private static final Logger logger = LoggerFactory.getLogger(BinarySearch.class);
+    private SearchObserver observer;
 
     public BinarySearch() {
         this(new DefaultSearchObserver());
     }
 
     public BinarySearch(SearchObserver observer) {
-        this.observer = observer != null ? observer : new DefaultSearchObserver();
+        setObserver(observer);
     }
 
     @Override
     public void setObserver(SearchObserver observer) {
+        logger.debug("Setting observer in BinarySearch: {}",
+                observer != null ? observer.getClass().getSimpleName() : "null");
         this.observer = observer != null ? observer : new DefaultSearchObserver();
     }
 
@@ -48,14 +50,15 @@ public class BinarySearch implements SearchStrategy {
             Vocabulary current = data.get(mid);
 
             // Notify observer for each step
-            observer.onSearchStep(new SearchStepInfo(
+            SearchStepInfo stepInfo = new SearchStepInfo(
                     comparisons,
                     left, language.getWord(data.get(left)),
                     mid, language.getWord(current),
                     right, language.getWord(data.get(right)),
                     comparisons,
                     (System.nanoTime() - startTime) / 1_000_000.0
-            ));
+            );
+            notifySearchStep(stepInfo);
 
             int comparison = language.getWord(current).compareToIgnoreCase(word);
             if (comparison == 0) {
@@ -76,6 +79,12 @@ public class BinarySearch implements SearchStrategy {
         observer.onSearchComplete(result, comparisons,
                 (System.nanoTime() - startTime) / 1_000_000.0);
         return result;
+    }
+
+    private void notifySearchStep(SearchStepInfo stepInfo) {
+        if (observer != null) {
+            observer.onSearchStep(stepInfo);
+        }
     }
 
     private SearchResult createFoundResult(Vocabulary vocab, Language language,
