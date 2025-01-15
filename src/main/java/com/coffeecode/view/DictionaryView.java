@@ -13,7 +13,7 @@ public class DictionaryView {
 
     public void display() {
         try {
-            viewModel.loadDictionary("src/main/resources/vocabulary.json");
+            viewModel.loadDictionary();
             System.out.println("English List: " + viewModel.getEnglishWords());
             System.out.println("Indonesian List: " + viewModel.getIndonesianWords());
         } catch (IOException e) {
