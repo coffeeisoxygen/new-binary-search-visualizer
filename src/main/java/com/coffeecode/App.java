@@ -9,6 +9,8 @@ import com.coffeecode.builder.DictionaryBuilder;
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
 import com.coffeecode.services.search.result.SearchResult;
+import com.coffeecode.services.visualization.SearchVisualization;
+import com.coffeecode.services.visualization.observer.SearchObserver;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class App {
@@ -27,31 +29,40 @@ public class App {
                     .build();
 
             if (viewModel.isLoaded()) {
-                demonstrateDictionary(viewModel);
+                System.out.println(ANSI_BLUE + "\n=== Dictionary Content ===" + ANSI_RESET);
+                printWordLists(viewModel);
+                
+                System.out.println(ANSI_BLUE + "\n=== Search Demonstrations ===" + ANSI_RESET);
+                runSearchDemonstrations(viewModel);
             }
         } catch (DictionaryException e) {
             logger.error("Dictionary error: {}", e.getMessage());
         }
     }
 
-    private static void demonstrateDictionary(DictionaryViewModel viewModel) {
-        // Print dictionary content
-        System.out.println(ANSI_BLUE + "\n=== Dictionary Content ===" + ANSI_RESET);
-        printWordLists(viewModel);
-
-        // Demonstrate search
-        System.out.println(ANSI_BLUE + "\n=== Search Demo ===" + ANSI_RESET);
-        demonstrateSearch(viewModel, "cat", Language.ENGLISH);
-        demonstrateSearch(viewModel, "kucing", Language.INDONESIAN);
+    private static void demonstrateSearch(DictionaryViewModel viewModel, String word, Language language) {
+        // Create visualization for this search
+        SearchObserver visualization = new SearchVisualization(word, language);
+        
+        // Configure search with visualization
+        viewModel.configureSearch(visualization);
+        
+        // Perform search
+        SearchResult result = viewModel.search(word, language);
+        
+        // Add spacing between searches
+        System.out.println();
     }
 
-    private static void demonstrateSearch(DictionaryViewModel viewModel,
-            String word, Language language) {
-        SearchResult result = viewModel.search(word, language);
-        System.out.printf("%sSearching for '%s' in %s: %s%s%n",
-                ANSI_YELLOW, word, language,
-                result.found() ? "Found: " + result.translation() : "Not found",
-                ANSI_RESET);
+    private static void runSearchDemonstrations(DictionaryViewModel viewModel) {
+        // Basic search demo
+        demonstrateSearch(viewModel, "cat", Language.ENGLISH);
+        demonstrateSearch(viewModel, "kucing", Language.INDONESIAN);
+        
+        // Edge cases demo
+        demonstrateSearch(viewModel, "ant", Language.ENGLISH);      // First word
+        demonstrateSearch(viewModel, "zebra", Language.ENGLISH);    // Last word
+        demonstrateSearch(viewModel, "moon", Language.ENGLISH);     // Not found
     }
 
     private static void printWordLists(DictionaryViewModel viewModel) {

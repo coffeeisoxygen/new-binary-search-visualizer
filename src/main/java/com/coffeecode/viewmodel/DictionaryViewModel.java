@@ -9,8 +9,10 @@ import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
 import com.coffeecode.services.dictionary.IDictionaryService;
 import com.coffeecode.services.search.result.SearchResult;
+import com.coffeecode.services.visualization.ISearchConfigurable;
+import com.coffeecode.services.visualization.observer.SearchObserver;
 
-public class DictionaryViewModel {
+public class DictionaryViewModel implements ISearchConfigurable {
 
     private static final Logger logger = LoggerFactory.getLogger(DictionaryViewModel.class);
     private final IDictionaryService dictionaryService;
@@ -34,5 +36,12 @@ public class DictionaryViewModel {
 
     public boolean isLoaded() {
         return dictionaryService.isInitialized();
+    }
+
+    @Override
+    public void configureSearch(SearchObserver observer) {
+        if (dictionaryService instanceof ISearchConfigurable configurable) {
+            configurable.configureSearch(observer);
+        }
     }
 }

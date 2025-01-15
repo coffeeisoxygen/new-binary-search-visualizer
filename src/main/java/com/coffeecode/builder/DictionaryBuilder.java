@@ -19,6 +19,8 @@ import com.coffeecode.services.search.SearchService;
 import com.coffeecode.services.search.strategy.BinarySearch;
 import com.coffeecode.services.sort.ISortService;
 import com.coffeecode.services.sort.SortService;
+import com.coffeecode.services.visualization.observer.DefaultSearchObserver;
+import com.coffeecode.services.visualization.observer.SearchObserver;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class DictionaryBuilder {
@@ -30,6 +32,7 @@ public class DictionaryBuilder {
     private ISortService sortService;
     private IFileService fileService;
     private IJsonService jsonService;
+    private SearchObserver searchObserver = new DefaultSearchObserver();
 
     public DictionaryBuilder withDictionaryPath(String path) {
         this.dictionaryPath = path;
@@ -50,6 +53,11 @@ public class DictionaryBuilder {
         this.sortService = sortService;
         this.fileService = fileService;
         this.jsonService = jsonService;
+        return this;
+    }
+
+    public DictionaryBuilder withSearchObserver(SearchObserver observer) {
+        this.searchObserver = observer != null ? observer : new DefaultSearchObserver();
         return this;
     }
 
@@ -96,7 +104,7 @@ public class DictionaryBuilder {
         this.fileService = fileService != null ? fileService
                 : new FileService(dictionaryPath, maxFileSize);
         this.searchService = searchService != null ? searchService
-                : new SearchService(new BinarySearch());
+                : new SearchService(new BinarySearch(searchObserver));
         this.sortService = sortService != null ? sortService : new SortService();
     }
 }
