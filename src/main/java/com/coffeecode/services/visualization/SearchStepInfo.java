@@ -1,4 +1,4 @@
-package com.coffeecode.services.visualization.observer;
+package com.coffeecode.services.visualization;
 
 public record SearchStepInfo(
         int step,

@@ -1,11 +1,11 @@
-package com.coffeecode.services.visualization.formater;
+package com.coffeecode.services.visualization.terminal;
 
 import java.util.List;
 
 import com.coffeecode.services.search.result.SearchResult;
-import com.coffeecode.services.visualization.observer.SearchStepInfo;
+import com.coffeecode.services.visualization.SearchStepInfo;
 
-public class SearchStepFormatter {
+public class TerminalFormatter {
 
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_GREEN = "\u001B[32m";
@@ -72,12 +72,12 @@ public class SearchStepFormatter {
             %sStep %d:%s
             %s[%d]%-15s < [%d]%-15s > [%d]%-15s%s
             """,
-            ANSI_YELLOW, info.step(), ANSI_RESET,
-            ANSI_GREEN,
-            info.low(), info.lowWord(),
-            info.mid(), info.midWord(),
-            info.high(), info.highWord(),
-            ANSI_RESET
+                ANSI_YELLOW, info.step(), ANSI_RESET,
+                ANSI_GREEN,
+                info.low(), info.lowWord(),
+                info.mid(), info.midWord(),
+                info.high(), info.highWord(),
+                ANSI_RESET
         );
     }
 
@@ -89,13 +89,14 @@ public class SearchStepFormatter {
             Time      : %.2f ms
             =======================================%s
             """,
-            ANSI_BLUE,
-            result.found() ? 
-                String.format("Found '%s' → '%s'", result.word(), result.translation()) :
-                String.format("'%s' not found", result.word()),
-            comparisons,
-            timeMs,
-            ANSI_RESET
+                ANSI_BLUE,
+                result.found()
+                ? String.format("Found '%s' → '%s'", result.word(), result.translation())
+                : String.format("'%s' not found", result.word()),
+                comparisons,
+                timeMs,
+                ANSI_RESET
         );
     }
+
 }

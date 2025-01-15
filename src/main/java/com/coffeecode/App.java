@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 import com.coffeecode.builder.DictionaryBuilder;
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
-import com.coffeecode.services.visualization.SearchVisualization;
-import com.coffeecode.services.visualization.formater.SearchStepFormatter;
 import com.coffeecode.services.visualization.observer.SearchObserver;
+import com.coffeecode.services.visualization.terminal.TerminalFormatter;
+import com.coffeecode.services.visualization.terminal.TerminalVisualizer;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class App {
 
     private static final Logger logger = LoggerFactory.getLogger(App.class);
     private static final Scanner scanner = new Scanner(System.in);
-    private static final SearchStepFormatter formatter = new SearchStepFormatter();
+    private static final TerminalFormatter formatter = new TerminalFormatter();
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = null;
 
@@ -94,16 +94,8 @@ public class App {
     }
 
     private static void demonstrateSearch(DictionaryViewModel viewModel, String word, Language language) {
-        // Create visualization observer
-        SearchObserver visualization = new SearchVisualization(word, language);
-
-        // Configure view model with observer
-        viewModel.configureSearch(visualization);
-
-        // Perform search with visualization
+        SearchObserver visualizer = new TerminalVisualizer(word, language);
+        viewModel.configureSearch(visualizer);
         viewModel.search(word, language);
-
-        // Add spacing for next operation
-        System.out.println();
     }
 }
