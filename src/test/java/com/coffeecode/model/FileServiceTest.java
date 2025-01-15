@@ -18,6 +18,9 @@ import com.coffeecode.exception.ExceptionMessages;
 
 class FileServiceTest {
 
+    private static final String TEST_RESOURCES = "src/test/resources/";
+    private static final String TEST_VOCABULARY_PATH = TEST_RESOURCES + "test-vocabulary.json";
+    private static final String EMPTY_VOCABULARY_PATH = TEST_RESOURCES + "empty-vocabulary.json";
     private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
     private FileService fileService;
     @TempDir
@@ -80,13 +83,12 @@ class FileServiceTest {
 
     // JSON Parsing Tests
     @Test
-    void loadVocabularies_WithValidJson_ShouldReturnVocabularyList() throws IOException {
-        File testFile = createTestFile("valid.json", VALID_JSON);
-        List<Vocabulary> result = fileService.loadVocabularies(testFile.getAbsolutePath());
+    void loadVocabularies_WithValidJson_ShouldReturnVocabularyList() {
+        List<Vocabulary> result = fileService.loadVocabularies(TEST_VOCABULARY_PATH);
 
         assertEquals(2, result.size());
-        assertVocabulary(result.get(0), "cat", "kucing");
-        assertVocabulary(result.get(1), "dog", "anjing");
+        assertVocabulary(result.get(0), "hello", "halo");
+        assertVocabulary(result.get(1), "world", "dunia");
     }
 
     @Test

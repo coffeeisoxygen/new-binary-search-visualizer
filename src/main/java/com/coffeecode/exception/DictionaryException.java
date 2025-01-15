@@ -3,11 +3,13 @@ package com.coffeecode.exception;
 public class DictionaryException extends LoggedException {
 
     public DictionaryException(String message) {
-        super(message != null ? message : "Unknown error");
+        // Remove duplicate prefix - already in ExceptionMessages
+        super(message != null ? message : ExceptionMessages.ERR_UNKNOWN);
     }
 
     public DictionaryException(String message, Throwable cause) {
-        super(message != null ? message : "Unknown error", cause);
+        // Remove duplicate prefix - already in ExceptionMessages
+        super(message != null ? message : ExceptionMessages.ERR_UNKNOWN, cause);
     }
 
     @Override
