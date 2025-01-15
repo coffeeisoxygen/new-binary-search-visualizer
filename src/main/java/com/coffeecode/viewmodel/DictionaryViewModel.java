@@ -5,6 +5,7 @@ import java.util.List;
 import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.exception.ErrorCode;
 import com.coffeecode.exception.ErrorHandler;
+import com.coffeecode.exception.ErrorResponse;
 import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
@@ -18,22 +19,25 @@ public class DictionaryViewModel {
     public DictionaryViewModel(IDictionary dictionary) {
         this.dictionary = dictionary;
         this.isDictionaryLoaded = false;
-        }
+    }
 
-        public void loadDictionary() {
+    public void loadDictionary() {
         try {
             dictionary.loadDefaultDictionary();
             isDictionaryLoaded = true;
-        } catch (DictionaryException e) {
-            isDictionaryLoaded = false;
-            ErrorHandler.handle(e);
         } catch (Exception e) {
             isDictionaryLoaded = false;
-            ErrorHandler.handle(e);
+            ErrorResponse response = ErrorHandler.handle(e);
+            // Handle UI response based on error type
+            if (response.requiresUserAction()) {
+                // Show user message and action required
+                System.out.println(response.userMessage());
+                System.out.println("Action required: " + response.actionRequired());
+            }
         }
-        }
+    }
 
-        public boolean isDictionaryLoaded() {
+    public boolean isDictionaryLoaded() {
         return isDictionaryLoaded;
     }
 

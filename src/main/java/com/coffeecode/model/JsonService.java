@@ -33,13 +33,16 @@ public class JsonService {
             if (vocabularyArray == null || !vocabularyArray.isArray()) {
                 throw new DictionaryException(
                         ErrorCode.INVALID_JSON,
-                        "JSON file must contain an array of vocabulary objects"
+                        "Invalid JSON structure: missing vocabulary array"
                 );
             }
 
             return vocabularyArray;
         } catch (IOException e) {
-            throw new DictionaryException(null, "Error reading JSON file: " + e.getMessage());
+            throw new DictionaryException(
+                    ErrorCode.INVALID_JSON,
+                    "Failed to read JSON file: " + e.getMessage()
+            );
         }
     }
 

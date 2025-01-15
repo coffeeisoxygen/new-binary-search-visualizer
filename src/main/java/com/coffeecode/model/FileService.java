@@ -40,17 +40,19 @@ public class FileService implements IFileService {
 
     private File validateAndGetFile(String filePath) {
         if (filePath == null || filePath.isBlank()) {
-            throw new DictionaryException(null, "File path cannot be empty");
-        }
-
-        if (!filePath.toLowerCase().endsWith(".json")) {
-            throw new DictionaryException(null, "File must be a JSON file");
+            throw new DictionaryException(
+                    ErrorCode.FILE_NOT_FOUND,
+                    "File path cannot be empty"
+            );
         }
 
         File file = new File(filePath);
-        validateFileExists(file);
-        validateFileSize(file);
-        validateFileReadable(file);
+        if (!file.exists()) {
+            throw new DictionaryException(
+                    ErrorCode.FILE_NOT_FOUND,
+                    String.format("File not found: %s", file.getAbsolutePath())
+            );
+        }
 
         return file;
     }
