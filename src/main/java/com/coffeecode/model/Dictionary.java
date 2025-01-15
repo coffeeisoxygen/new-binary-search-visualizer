@@ -2,6 +2,7 @@ package com.coffeecode.model;
 
 import java.io.IOException;
 import java.util.List;
+
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
 
@@ -9,9 +10,9 @@ public class Dictionary implements IDictionary {
 
     private List<Vocabulary> vocabularies;
     private final SearchStrategy searchStrategy;
-    private final FileService fileService;
+    private final IFileService fileService;
 
-    public Dictionary(SearchStrategy searchStrategy, FileService fileService) {
+    public Dictionary(SearchStrategy searchStrategy, IFileService fileService) {
         this.searchStrategy = searchStrategy;
         this.fileService = fileService;
     }
@@ -23,6 +24,9 @@ public class Dictionary implements IDictionary {
 
     @Override
     public void loadVocabularies(String filePath) throws IOException {
+        if (filePath == null || filePath.isBlank()) {
+            throw new IllegalArgumentException("File path cannot be empty");
+        }
         this.vocabularies = fileService.loadVocabularies(filePath);
     }
 
@@ -50,6 +54,9 @@ public class Dictionary implements IDictionary {
 
     @Override
     public SearchResult search(String word, Language language) {
+        if (vocabularies == null) {
+            throw new IllegalStateException("Vocabularies have not been loaded");
+        }
         return searchStrategy.search(word, vocabularies, language);
     }
 }
