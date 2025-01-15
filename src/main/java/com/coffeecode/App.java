@@ -1,5 +1,7 @@
 package com.coffeecode;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +43,7 @@ public class App {
             SearchResult indonesianResult = indonesianSearch.search(indonesianWord);
             displaySearchResult("Indonesian", indonesianWord, indonesianResult);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Application error", e);
         }
     }
@@ -49,7 +51,7 @@ public class App {
     private static void displaySearchResult(String language, String word, SearchResult result) {
         System.out.println("\nSearching " + language + " word: " + word);
         result.displaySteps();
-        
+
         if (result.isFound()) {
             System.out.println("Found translation: " + result.getResult());
         } else {
