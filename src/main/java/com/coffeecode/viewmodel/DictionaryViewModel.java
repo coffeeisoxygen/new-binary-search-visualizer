@@ -3,6 +3,7 @@ package com.coffeecode.viewmodel;
 import java.io.IOException;
 import java.util.List;
 
+import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
@@ -22,7 +23,7 @@ public class DictionaryViewModel {
         try {
             dictionary.loadDefaultDictionary();
             isDictionaryLoaded = true;
-        } catch (IOException e) {
+        } catch (DictionaryException e) {
             isDictionaryLoaded = false;
             throw new IOException("Failed to load dictionary", e);
         }

@@ -1,6 +1,5 @@
 package com.coffeecode.model;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.coffeecode.exception.DictionaryException;
@@ -20,7 +19,7 @@ public class Dictionary implements IDictionary {
     }
 
     @Override
-    public void loadDefaultDictionary() throws IOException {
+    public void loadDefaultDictionary() throws DictionaryException {
         this.vocabularies = fileService.loadDefaultDictionary();
     }
 
@@ -33,12 +32,14 @@ public class Dictionary implements IDictionary {
     }
 
     @Override
-    public List<String> getEnglishWords() {
+    public List<String> getEnglishWords() throws DictionaryException {
+        validateDictionaryLoaded();
         return getWordsByLanguage(Language.ENGLISH);
     }
 
     @Override
-    public List<String> getIndonesianWords() {
+    public List<String> getIndonesianWords() throws DictionaryException {
+        validateDictionaryLoaded();
         return getWordsByLanguage(Language.INDONESIAN);
     }
 
@@ -50,15 +51,23 @@ public class Dictionary implements IDictionary {
     }
 
     @Override
-    public List<Vocabulary> getVocabularies() {
+    public List<Vocabulary> getVocabularies() throws DictionaryException {
+        validateDictionaryLoaded();
         return vocabularies;
     }
 
     @Override
-    public SearchResult search(String word, Language language) {
-        if (vocabularies == null) {
-            throw new IllegalStateException("Vocabularies have not been loaded");
+    public SearchResult search(String word, Language language) throws DictionaryException {
+        validateDictionaryLoaded();
+        if (word == null || word.isBlank()) {
+            throw new DictionaryException(ExceptionMessages.ERR_WORD_EMPTY);
         }
         return searchStrategy.search(word, vocabularies, language);
+    }
+
+    private void validateDictionaryLoaded() throws DictionaryException {
+        if (vocabularies == null) {
+            throw new DictionaryException(ExceptionMessages.ERR_DICT_NOT_LOADED);
+        }
     }
 }
