@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
+import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
 
@@ -40,27 +41,27 @@ public class DictionaryTest {
 
     // Loading Tests
     @Test
-    void loadDefaultDictionary_ShouldLoadVocabularies() throws IOException {
+    void loadDefaultDictionary_ShouldLoadVocabularies() throws DictionaryException, IOException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
         assertEquals(testVocabularies, dictionary.getVocabularies());
     }
 
     @Test
-    void loadDictionaryWithInvalidPathShouldThrowException() throws IOException {
+    void loadDictionaryWithInvalidPathShouldThrowException() throws DictionaryException {
         // Setup mock behavior
         when(fileService.loadVocabularies("invalid/path"))
-            .thenThrow(new IOException("File not found: invalid/path"));
-        
+                .thenThrow(new IOException("File not found: invalid/path"));
+
         // Execute and verify
         IOException exception = assertThrows(
-            IOException.class,
-            () -> dictionary.loadVocabularies("invalid/path")
+                IOException.class,
+                () -> dictionary.loadVocabularies("invalid/path")
         );
-        
+
         // Verify exact message
         assertEquals("File not found: invalid/path", exception.getMessage());
-        
+
         // Verify mock was called
         verify(fileService).loadVocabularies("invalid/path");
     }
@@ -84,7 +85,7 @@ public class DictionaryTest {
     }
 
     @Test
-    void loadDictionary_WithInvalidPath_ShouldThrowException() throws IOException {
+    void loadDictionary_WithInvalidPath_ShouldThrowException() throws DictionaryException {
         when(fileService.loadVocabularies("invalid/path"))
                 .thenThrow(new IOException("File not found: invalid/path"));
 
@@ -96,7 +97,7 @@ public class DictionaryTest {
     }
 
     @Test
-    void loadDictionary_WithInvalidJson_ShouldThrowException() throws IOException {
+    void loadDictionary_WithInvalidJson_ShouldThrowException() throws DictionaryException {
         when(fileService.loadVocabularies("invalid.json"))
                 .thenThrow(new IOException("Invalid file format: missing vocabulary array"));
 

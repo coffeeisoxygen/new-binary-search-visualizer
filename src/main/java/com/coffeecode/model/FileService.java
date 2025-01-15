@@ -1,6 +1,7 @@
 package com.coffeecode.model;
 
 import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.exception.ExceptionMessages;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,10 +15,6 @@ public class FileService implements IFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
     private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
-    private static final String ERR_FILE_NOT_FOUND = "File not found: %s";
-    private static final String ERR_FILE_NOT_READABLE = "Cannot read file: %s";
-    private static final String ERR_INVALID_JSON = "Invalid JSON structure: %s";
-    private static final String ERR_EMPTY_PATH = "File path cannot be empty";
 
     private final ObjectMapper objectMapper;
 
@@ -40,17 +37,17 @@ public class FileService implements IFileService {
 
     private File validateAndGetFile(String filePath) {
         if (filePath == null || filePath.isBlank()) {
-            throw new DictionaryException(ERR_EMPTY_PATH);
+            throw new DictionaryException(ExceptionMessages.ERR_FILE_PATH_EMPTY);
         }
 
         File file = new File(filePath);
         if (!file.exists()) {
             String absolutePath = file.getAbsolutePath();
-            logger.error("File not found at path: {}", absolutePath);
-            throw new DictionaryException(String.format(ERR_FILE_NOT_FOUND, absolutePath));
+            logger.error(ExceptionMessages.ERR_FILE_NOT_FOUND, absolutePath);
+            throw new DictionaryException(String.format(ExceptionMessages.ERR_FILE_NOT_FOUND, absolutePath));
         }
         if (!file.canRead()) {
-            throw new DictionaryException(String.format(ERR_FILE_NOT_READABLE, file.getAbsolutePath()));
+            throw new DictionaryException(String.format(ExceptionMessages.ERR_FILE_NOT_READABLE, file.getAbsolutePath()));
         }
         return file;
     }
@@ -61,12 +58,12 @@ public class FileService implements IFileService {
             JsonNode vocabularyArray = root.get("vocabulary");
 
             if (vocabularyArray == null || !vocabularyArray.isArray()) {
-                throw new DictionaryException(String.format(ERR_INVALID_JSON, "missing or invalid vocabulary array"));
+                throw new DictionaryException(String.format(ExceptionMessages.ERR_INVALID_JSON, file.getAbsolutePath()));
             }
 
             return vocabularyArray;
         } catch (IOException e) {
-            throw new DictionaryException(String.format("Failed to parse dictionary file at %s", file.getAbsolutePath()), e);
+            throw new DictionaryException(String.format(ExceptionMessages.ERR_PARSE_JSON, file.getAbsolutePath()), e);
         }
     }
 
@@ -75,7 +72,7 @@ public class FileService implements IFileService {
             return objectMapper.convertValue(vocabularyArray, new TypeReference<List<Vocabulary>>() {
             });
         } catch (IllegalArgumentException e) {
-            throw new DictionaryException("Failed to convert JSON to vocabulary list", e);
+            throw new DictionaryException(ExceptionMessages.ERR_CONVERT_JSON, e);
         }
     }
 }

@@ -3,6 +3,8 @@ package com.coffeecode.model;
 import java.io.IOException;
 import java.util.List;
 
+import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.exception.ExceptionMessages;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
 
@@ -23,9 +25,9 @@ public class Dictionary implements IDictionary {
     }
 
     @Override
-    public void loadVocabularies(String filePath) throws IOException {
+    public void loadVocabularies(String filePath) throws DictionaryException {
         if (filePath == null || filePath.isBlank()) {
-            throw new IllegalArgumentException("File path cannot be empty");
+            throw new DictionaryException(ExceptionMessages.ERR_FILE_PATH_EMPTY);
         }
         this.vocabularies = fileService.loadVocabularies(filePath);
     }
