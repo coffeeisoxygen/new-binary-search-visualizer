@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,11 @@ class FileServiceTest {
     @BeforeEach
     void setUp() {
         fileService = new FileService();
+        // Ensure the default dictionary file does not exist before running tests
+        File defaultFile = new File(DEFAULT_DICTIONARY_PATH);
+        if (defaultFile.exists()) {
+            defaultFile.delete();
+        }
     }
 
     // File Validation Tests
@@ -97,14 +103,23 @@ class FileServiceTest {
     // Default Dictionary Tests
     @Test
     void loadDefaultDictionary_WhenFileNotFound_ShouldThrowException() {
+        // Verify file doesn't exist first
+        File defaultFile = new File(DEFAULT_DICTIONARY_PATH);
+        assertFalse(defaultFile.exists(), "Test requires file to not exist");
+
         var exception = assertThrows(
-            DictionaryException.class,
-            () -> fileService.loadDefaultDictionary()
+                DictionaryException.class,
+                () -> fileService.loadDefaultDictionary()
         );
-        assertEquals(
-            String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH),
-            exception.getMessage()
-        );
+
+        String expectedMessage = String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH);
+        String actualMessage = exception.getMessage();
+
+        // Add debug output
+        System.out.println("Expected: " + expectedMessage);
+        System.out.println("Actual: " + actualMessage);
+
+        assertEquals(expectedMessage, actualMessage);
     }
 
     // Helper Methods
