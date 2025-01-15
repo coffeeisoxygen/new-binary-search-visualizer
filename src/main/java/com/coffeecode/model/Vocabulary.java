@@ -1,7 +1,7 @@
 package com.coffeecode.model;
 
 /*
- * this class is responsible for Data Structure
+ * this class is responsible for Data Structure from json file
  */
 public record Vocabulary(String english, String indonesian) {
     public Vocabulary {
@@ -11,14 +11,5 @@ public record Vocabulary(String english, String indonesian) {
         if (indonesian == null || indonesian.isBlank()) {
             throw new IllegalArgumentException("Indonesian word cannot be empty");
         }
-    }
-
-    // getters
-    public String getEnglish() {
-        return english;
-    }
-
-    public String getIndonesian() {
-        return indonesian;
     }
 }

@@ -1,38 +1,38 @@
-package com.coffeecode.viewmodel;
+// package com.coffeecode.viewmodel;
 
-import java.io.IOException;
-import java.util.List;
+// import java.io.IOException;
+// import java.util.List;
 
-import com.coffeecode.model.Language;
-import com.coffeecode.model.SearchResult;
-import com.coffeecode.model.Vocabulary;
-import com.coffeecode.repository.DictionaryRepository;
-import com.coffeecode.services.DictionaryService;
+// import com.coffeecode.model.IDictionary;
+// import com.coffeecode.model.Language;
+// import com.coffeecode.model.Vocabulary;
+// import com.coffeecode.tracker.SearchResult;
 
-public class DictionaryViewModel {
-    private final DictionaryService service;
+// public class DictionaryViewModel {
 
-    public DictionaryViewModel(DictionaryRepository repository) {
-        this.service = new DictionaryService(repository);
-    }
+//     private final IDictionary service;
 
-    public void loadDictionary() throws IOException {
-        service.loadDefaultDictionary();
-    }
+//     public DictionaryViewModel(IDictionary service) {
+//         this.service = service;
+//     }
 
-    public List<String> getEnglishWords() {
-        return service.getEnglishWords();
-    }
+//     public void loadDictionary() throws IOException {
+//         service.loadDefaultDictionary();
+//     }
 
-    public List<String> getIndonesianWords() {
-        return service.getIndonesianWords();
-    }
+//     public List<String> getEnglishWords() {
+//         return service.getEnglishWords();
+//     }
 
-    public List<Vocabulary> getVocabularies() {
-        return service.getVocabularies();
-    }
+//     public List<String> getIndonesianWords() {
+//         return service.getIndonesianWords();
+//     }
 
-    public SearchResult search(String word, Language language) {
-        return service.search(word, language);
-    }
-}
+//     public List<Vocabulary> getVocabularies() {
+//         return service.getVocabularies();
+//     }
+
+//     public SearchResult search(String word, Language language) {
+//         return service.search(word, language);
+//     }
+// }
