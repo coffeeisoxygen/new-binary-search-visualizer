@@ -1,6 +1,8 @@
 package com.coffeecode.exception;
 
 public enum ErrorCode {
+    // Path related errors
+    INVALID_FILE_PATH("DICT000", "Invalid File Path"),
     // File related errors
     FILE_NOT_FOUND("DICT001", "File Not Found"),
     INVALID_JSON("DICT002", "Invalid Dictionary Format"),

@@ -25,15 +25,18 @@ public class JsonService implements IJsonService {
 
     @Override
     public List<Vocabulary> parseVocabularyFile(File file) throws DictionaryException {
-        logger.info("Parsing vocabulary file: {}", file.getPath());
         try {
-            logger.info("Validating JSON structure");
+            // 1. Parse JSON
             JsonNode root = objectMapper.readTree(file);
+
+            // 2. Validate structure
             validateJsonStructure(root);
             JsonNode vocabularyArray = root.get("vocabulary");
-            logger.info("Converting JSON to Vocabulary list");
+
+            // 3. Convert and validate data
             List<Vocabulary> vocabularies = convertToVocabularyList(vocabularyArray, file.getPath());
-            logger.info("Successfully converted JSON to Vocabulary list with size: {}", vocabularies.size());
+            validateVocabularies(vocabularies);
+
             return vocabularies;
         } catch (IOException e) {
             throw new DictionaryException(
