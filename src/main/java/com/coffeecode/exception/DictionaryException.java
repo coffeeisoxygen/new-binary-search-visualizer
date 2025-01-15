@@ -1,24 +1,19 @@
 package com.coffeecode.exception;
 
-public class DictionaryException extends LoggedException {
+public class DictionaryException extends RuntimeException {
+    private final ErrorCode errorCode;
 
-    public DictionaryException(String message) {
-
-        super(message != null ? message : ExceptionMessages.ERR_UNKNOWN);
+    public DictionaryException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
     }
 
-    public DictionaryException(String message, Throwable cause) {
-
-        super(message != null ? message : ExceptionMessages.ERR_UNKNOWN, cause);
+    public DictionaryException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
     }
 
-    @Override
-    public String toString() {
-        String message = getMessage();
-        Throwable cause = getCause();
-        if (cause != null) {
-            return message + ": " + cause.toString();
-        }
-        return message;
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 }

@@ -3,7 +3,8 @@ package com.coffeecode.viewmodel;
 import java.util.List;
 
 import com.coffeecode.exception.DictionaryException;
-import com.coffeecode.exception.ExceptionMessages;
+import com.coffeecode.exception.ErrorCode;
+import com.coffeecode.exception.ErrorHandler;
 import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
@@ -17,19 +18,22 @@ public class DictionaryViewModel {
     public DictionaryViewModel(IDictionary dictionary) {
         this.dictionary = dictionary;
         this.isDictionaryLoaded = false;
-    }
+        }
 
-    public void loadDictionary() throws DictionaryException {
+        public void loadDictionary() {
         try {
             dictionary.loadDefaultDictionary();
             isDictionaryLoaded = true;
         } catch (DictionaryException e) {
             isDictionaryLoaded = false;
-            throw e;
+            ErrorHandler.handle(e);
+        } catch (Exception e) {
+            isDictionaryLoaded = false;
+            ErrorHandler.handle(e);
         }
-    }
+        }
 
-    public boolean isDictionaryLoaded() {
+        public boolean isDictionaryLoaded() {
         return isDictionaryLoaded;
     }
 
@@ -48,17 +52,23 @@ public class DictionaryViewModel {
         return dictionary.getVocabularies();
     }
 
-    public SearchResult search(String word, Language language) throws DictionaryException {
+    public SearchResult search(String word, Language language) {
         validateDictionaryLoaded();
         if (word == null || word.trim().isEmpty()) {
-            throw new DictionaryException(ExceptionMessages.ERR_WORD_EMPTY);
+            throw new DictionaryException(
+                    ErrorCode.INVALID_WORD,
+                    "Search word cannot be empty"
+            );
         }
         return dictionary.search(word.trim(), language);
     }
 
-    private void validateDictionaryLoaded() throws DictionaryException {
+    private void validateDictionaryLoaded() {
         if (!isDictionaryLoaded) {
-            throw new DictionaryException(ExceptionMessages.ERR_DICT_NOT_LOADED);
+            throw new DictionaryException(
+                    ErrorCode.DICTIONARY_NOT_LOADED,
+                    "Dictionary not loaded. Please load a dictionary first."
+            );
         }
     }
 }

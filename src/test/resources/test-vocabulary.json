@@ -1,6 +1,6 @@
 {
     "vocabulary": [
-        {"english": "hello", "indonesian": "halo"},
-        {"english": "world", "indonesian": "dunia"}
+        {"english": "cat", "indonesian": "kucing"},
+        {"english": "dog", "indonesian": "anjing"}
     ]
 }
