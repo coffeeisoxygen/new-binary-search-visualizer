@@ -1,6 +1,7 @@
 package com.coffeecode.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,22 +40,23 @@ public class FileService implements IFileService {
     }
 
     private File validateAndGetFile(String filePath) {
+        validateFilePath(filePath);
+        File file = new File(filePath);
+        validateFileExists(file);
+        validateFileSize(file);
+        validateFileReadable(file);
+        validateFileExtension(file);
+        validatePathSecurity(file);
+        return file;
+    }
+
+    private void validateFilePath(String filePath) {
         if (filePath == null || filePath.isBlank()) {
             throw new DictionaryException(
                     ErrorCode.FILE_NOT_FOUND,
                     "File path cannot be empty"
             );
         }
-
-        File file = new File(filePath);
-        if (!file.exists()) {
-            throw new DictionaryException(
-                    ErrorCode.FILE_NOT_FOUND,
-                    String.format("File not found: %s", file.getAbsolutePath())
-            );
-        }
-
-        return file;
     }
 
     private void validateFileExists(File file) {
@@ -80,6 +82,34 @@ public class FileService implements IFileService {
             throw new DictionaryException(
                     ErrorCode.PERMISSION_DENIED,
                     String.format("Cannot read file: %s", file.getPath())
+            );
+        }
+    }
+
+    private void validateFileExtension(File file) {
+        if (!file.getName().toLowerCase().endsWith(".json")) {
+            throw new DictionaryException(
+                    ErrorCode.INVALID_FILE_TYPE,
+                    String.format("Invalid file type: %s (must be .json)", file.getName())
+            );
+        }
+    }
+
+    private void validatePathSecurity(File file) {
+        try {
+            String canonicalPath = file.getCanonicalPath();
+            String allowedPath = new File(".").getCanonicalPath();
+
+            if (!canonicalPath.startsWith(allowedPath)) {
+                throw new DictionaryException(
+                        ErrorCode.PERMISSION_DENIED,
+                        "Access to file outside application directory is not allowed"
+                );
+            }
+        } catch (IOException e) {
+            throw new DictionaryException(
+                    ErrorCode.PERMISSION_DENIED,
+                    "Unable to validate file path security"
             );
         }
     }

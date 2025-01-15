@@ -6,6 +6,7 @@ public enum ErrorCode {
     INVALID_JSON("DICT002", "Invalid Dictionary Format"),
     FILE_TOO_LARGE("DICT003", "File Too Large"),
     PERMISSION_DENIED("DICT004", "Access Denied"),
+    INVALID_FILE_TYPE("DICT005", "Invalid File Type"),
     // Dictionary related errors
     DUPLICATE_ENTRY("DICT005", "Duplicate Word"),
     INVALID_WORD("DICT006", "Invalid Word"),
