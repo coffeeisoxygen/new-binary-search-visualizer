@@ -36,42 +36,35 @@ public class BinarySearch implements SearchStrategy {
         int comparisons = 0;
 
         if (data.isEmpty()) {
-            logger.debug("Empty dictionary, returning not found for: {}", word);
             return createNotFoundResult(word, comparisons, startTime);
         }
 
-        return performBinarySearch(word, new SearchParameters(
-                data, language, 0, 0, data.size() - 1, 0, startTime
-        ));
-    }
-
-    private SearchResult performBinarySearch(String word, SearchParameters params) {
-        int left = params.getLeft();
-        int right = params.getRight();
-        int comparisons = params.getComparisons();
-        long startTime = params.getStartTime();
+        int left = 0;
+        int right = data.size() - 1;
 
         while (left <= right) {
             comparisons++;
             int mid = left + (right - left) / 2;
-            Vocabulary current = params.getData().get(mid);
+            Vocabulary current = data.get(mid);
 
-            // Notify observer of current step
+            // Notify observer for each step
             observer.onSearchStep(new SearchStepInfo(
                     comparisons,
-                    left, params.getLanguage().getWord(params.getData().get(left)),
-                    mid, params.getLanguage().getWord(current),
-                    right, params.getLanguage().getWord(params.getData().get(right)),
+                    left, language.getWord(data.get(left)),
+                    mid, language.getWord(current),
+                    right, language.getWord(data.get(right)),
                     comparisons,
                     (System.nanoTime() - startTime) / 1_000_000.0
             ));
 
-            int comparison = params.getLanguage().getWord(current).compareToIgnoreCase(word);
+            int comparison = language.getWord(current).compareToIgnoreCase(word);
             if (comparison == 0) {
-                SearchResult result = createFoundResult(current, params.getLanguage(), comparisons, startTime);
-                observer.onSearchComplete(result, comparisons, result.timeMs());
+                SearchResult result = createFoundResult(current, language, comparisons, startTime);
+                observer.onSearchComplete(result, comparisons,
+                        (System.nanoTime() - startTime) / 1_000_000.0);
                 return result;
             }
+
             if (comparison < 0) {
                 left = mid + 1;
             } else {
@@ -80,7 +73,8 @@ public class BinarySearch implements SearchStrategy {
         }
 
         SearchResult result = createNotFoundResult(word, comparisons, startTime);
-        observer.onSearchComplete(result, comparisons, result.timeMs());
+        observer.onSearchComplete(result, comparisons,
+                (System.nanoTime() - startTime) / 1_000_000.0);
         return result;
     }
 
@@ -95,8 +89,7 @@ public class BinarySearch implements SearchStrategy {
         );
     }
 
-    private SearchResult createNotFoundResult(String word,
-            int comparisons, long startTime) {
+    private SearchResult createNotFoundResult(String word, int comparisons, long startTime) {
         return new SearchResult(
                 false,
                 word,

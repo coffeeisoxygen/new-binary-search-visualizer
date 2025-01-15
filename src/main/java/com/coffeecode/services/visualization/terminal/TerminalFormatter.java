@@ -11,6 +11,7 @@ public class TerminalFormatter {
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_RED = "\u001B[31m";
 
     public String formatWelcomeScreen(List<String> englishWords, List<String> indonesianWords) {
         StringBuilder sb = new StringBuilder();
@@ -90,17 +91,21 @@ public class TerminalFormatter {
             =======================================%s
             """,
                 ANSI_BLUE,
-                result.found()
-                ? String.format("Found '%s' → '%s'", result.word(), result.translation())
-                : String.format("'%s' not found", result.word()),
+                formatResult(result),
                 comparisons,
                 timeMs,
                 ANSI_RESET
         );
     }
 
-    public char[] formatError(String string) {
-        return string.toCharArray();
+    public String formatError(String message) {
+        return String.format("%s%s%s", ANSI_RED, message, ANSI_RESET);
+    }
+
+    private String formatResult(SearchResult result) {
+        return result.found() ?
+                String.format("Found '%s' → '%s'", result.word(), result.translation()) :
+                String.format("'%s' not found", result.word());
     }
 
 }

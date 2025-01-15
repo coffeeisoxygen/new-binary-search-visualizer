@@ -37,5 +37,6 @@ public class TerminalVisualizer implements SearchObserver {
     public void onSearchComplete(SearchResult result, int comparisons, double timeMs) {
         double totalTime = (System.nanoTime() - startTime) / 1_000_000.0;
         System.out.println(formatter.formatSearchSummary(result, comparisons, totalTime));
+        System.out.println();
     }
 }
