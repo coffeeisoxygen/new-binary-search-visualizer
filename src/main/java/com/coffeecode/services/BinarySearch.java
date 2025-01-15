@@ -1,10 +1,12 @@
 package com.coffeecode.services;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import com.coffeecode.model.Language;
 import com.coffeecode.model.SearchResult;
+import com.coffeecode.model.SearchStep;
 import com.coffeecode.model.Vocabulary;
 
 public class BinarySearch {
@@ -28,6 +30,7 @@ public class BinarySearch {
             throw new IllegalArgumentException("Search word cannot be empty");
         }
 
+        List<SearchStep> steps = new ArrayList<>();
         int left = 0;
         int right = vocabularies.size() - 1;
 
@@ -39,13 +42,14 @@ public class BinarySearch {
             };
 
             int comparison = currentWord.compareToIgnoreCase(word);
+            steps.add(new SearchStep(left, mid, right, currentWord, comparison));
 
             if (comparison == 0) {
                 String result = switch (language) {
                     case ENGLISH -> vocabularies.get(mid).indonesian();
                     case INDONESIAN -> vocabularies.get(mid).english();
                 };
-                return new SearchResult(left, mid, right, result, true);
+                return new SearchResult(left, mid, right, result, true, steps);
             }
 
             if (comparison < 0) {
@@ -55,6 +59,6 @@ public class BinarySearch {
             }
         }
 
-        return new SearchResult(left, (left + right) / 2, right, "", false);
+        return new SearchResult(left, (left + right) / 2, right, "", false, steps);
     }
 }

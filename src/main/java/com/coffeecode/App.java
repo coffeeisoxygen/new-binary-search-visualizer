@@ -48,10 +48,8 @@ public class App {
 
     private static void displaySearchResult(String language, String word, SearchResult result) {
         System.out.println("\nSearching " + language + " word: " + word);
-        System.out.println("Search progress:");
-        System.out.printf("Low: %d, Mid: %d, High: %d%n",
-                result.getLow(), result.getMid(), result.getHigh());
-
+        result.displaySteps();
+        
         if (result.isFound()) {
             System.out.println("Found translation: " + result.getResult());
         } else {
