@@ -21,7 +21,7 @@ class FileServiceTest {
     private static final String TEST_RESOURCES = "src/test/resources/";
     private static final String TEST_VOCABULARY_PATH = TEST_RESOURCES + "test-vocabulary.json";
     private static final String EMPTY_VOCABULARY_PATH = TEST_RESOURCES + "empty-vocabulary.json";
-    private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
+    private static final String DEFAULT_DICTIONARY_PATH = "src/test/resources/vocabulary.json";
     private FileService fileService;
     @TempDir
     File tempDir;
