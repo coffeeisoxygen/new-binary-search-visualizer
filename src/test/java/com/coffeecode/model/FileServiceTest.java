@@ -17,6 +17,7 @@ import com.coffeecode.exception.ExceptionMessages;
 
 class FileServiceTest {
 
+    private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
     private FileService fileService;
     @TempDir
     File tempDir;
@@ -62,11 +63,13 @@ class FileServiceTest {
 
     @Test
     void loadVocabularies_WithNonexistentFile_ShouldThrowException() {
+        String nonexistentPath = "nonexistent.json";
         var exception = assertThrows(
                 DictionaryException.class,
-                () -> fileService.loadVocabularies("nonexistent.json")
+                () -> fileService.loadVocabularies(nonexistentPath)
         );
-        assertTrue(exception.getMessage().startsWith(ExceptionMessages.ERR_FILE_NOT_FOUND));
+        assertTrue(exception.getMessage().contains(nonexistentPath));
+        assertTrue(exception.getMessage().startsWith(String.format(ExceptionMessages.ERR_FILE_NOT_FOUND, "")));
     }
 
     // JSON Parsing Tests
@@ -83,9 +86,10 @@ class FileServiceTest {
     @Test
     void loadVocabularies_WithInvalidJson_ShouldThrowException() throws IOException {
         File testFile = createTestFile("invalid.json", INVALID_JSON);
+        String path = testFile.getAbsolutePath();
         var exception = assertThrows(
                 DictionaryException.class,
-                () -> fileService.loadVocabularies(testFile.getAbsolutePath())
+                () -> fileService.loadVocabularies(path)
         );
         assertTrue(exception.getMessage().contains("Invalid JSON structure"));
     }
@@ -94,10 +98,13 @@ class FileServiceTest {
     @Test
     void loadDefaultDictionary_WhenFileNotFound_ShouldThrowException() {
         var exception = assertThrows(
-                DictionaryException.class,
-                () -> fileService.loadDefaultDictionary()
+            DictionaryException.class,
+            () -> fileService.loadDefaultDictionary()
         );
-        assertTrue(exception.getMessage().startsWith(ExceptionMessages.ERR_FILE_NOT_FOUND));
+        assertEquals(
+            String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH),
+            exception.getMessage()
+        );
     }
 
     // Helper Methods

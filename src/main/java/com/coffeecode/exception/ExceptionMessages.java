@@ -9,7 +9,8 @@ public final class ExceptionMessages {
 
     // File errors
     public static final String ERR_FILE_PATH_EMPTY = PREFIX + "File path cannot be empty";
-    public static final String ERR_FILE_NOT_FOUND = PREFIX + "File not found: %s";
+    public static final String ERR_DEFAULT_DICT_NOT_FOUND = PREFIX + "Default dictionary not found at: %s";
+    public static final String ERR_FILE_NOT_FOUND = PREFIX + "File not found at: %s";
     public static final String ERR_FILE_NOT_READABLE = PREFIX + "Cannot read file: %s";
 
     // JSON errors

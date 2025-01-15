@@ -25,6 +25,14 @@ public class FileService implements IFileService {
     @Override
     public List<Vocabulary> loadDefaultDictionary() throws DictionaryException {
         logger.info("Loading default dictionary from: {}", DEFAULT_DICTIONARY_PATH);
+        File defaultFile = new File(DEFAULT_DICTIONARY_PATH);
+
+        if (!defaultFile.exists()) {
+            String errorMessage = String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH);
+            logger.error(errorMessage);
+            throw new DictionaryException(errorMessage);
+        }
+
         return loadVocabularies(DEFAULT_DICTIONARY_PATH);
     }
 
