@@ -14,14 +14,19 @@ import com.coffeecode.services.visualization.observer.SearchObserver;
 
 public class BinarySearch implements SearchStrategy {
 
+    private SearchObserver observer;
     private static final Logger logger = LoggerFactory.getLogger(BinarySearch.class);
-    private final SearchObserver observer;
 
     public BinarySearch() {
         this(new DefaultSearchObserver());
     }
 
     public BinarySearch(SearchObserver observer) {
+        this.observer = observer != null ? observer : new DefaultSearchObserver();
+    }
+
+    @Override
+    public void setObserver(SearchObserver observer) {
         this.observer = observer != null ? observer : new DefaultSearchObserver();
     }
 
@@ -35,20 +40,37 @@ public class BinarySearch implements SearchStrategy {
             return createNotFoundResult(word, comparisons, startTime);
         }
 
-        logger.debug("Starting binary search for '{}' in {} dictionary", word, language);
-        int left = 0;
-        int right = data.size() - 1;
+        return performBinarySearch(word, new SearchParameters(
+                data, language, 0, 0, data.size() - 1, 0, startTime
+        ));
+    }
+
+    private SearchResult performBinarySearch(String word, SearchParameters params) {
+        int left = params.getLeft();
+        int right = params.getRight();
+        int comparisons = params.getComparisons();
+        long startTime = params.getStartTime();
 
         while (left <= right) {
             comparisons++;
             int mid = left + (right - left) / 2;
-            Vocabulary current = data.get(mid);
+            Vocabulary current = params.getData().get(mid);
 
-            notifySearchStep(word, data, language, left, mid, right, comparisons, startTime);
+            // Notify observer of current step
+            observer.onSearchStep(new SearchStepInfo(
+                    comparisons,
+                    left, params.getLanguage().getWord(params.getData().get(left)),
+                    mid, params.getLanguage().getWord(current),
+                    right, params.getLanguage().getWord(params.getData().get(right)),
+                    comparisons,
+                    (System.nanoTime() - startTime) / 1_000_000.0
+            ));
 
-            int comparison = language.getWord(current).compareToIgnoreCase(word);
+            int comparison = params.getLanguage().getWord(current).compareToIgnoreCase(word);
             if (comparison == 0) {
-                return createFoundResult(current, language, comparisons, startTime);
+                SearchResult result = createFoundResult(current, params.getLanguage(), comparisons, startTime);
+                observer.onSearchComplete(result, comparisons, result.timeMs());
+                return result;
             }
             if (comparison < 0) {
                 left = mid + 1;
@@ -57,19 +79,9 @@ public class BinarySearch implements SearchStrategy {
             }
         }
 
-        return createNotFoundResult(word, comparisons, startTime);
-    }
-
-    private void notifySearchStep(String word, List<Vocabulary> data, Language language,
-            int left, int mid, int right, int comparisons, long startTime) {
-        observer.onSearchStep(new SearchStepInfo(
-                comparisons,
-                left, language.getWord(data.get(left)),
-                mid, language.getWord(data.get(mid)),
-                right, language.getWord(data.get(right)),
-                comparisons,
-                (System.nanoTime() - startTime) / 1_000_000.0
-        ));
+        SearchResult result = createNotFoundResult(word, comparisons, startTime);
+        observer.onSearchComplete(result, comparisons, result.timeMs());
+        return result;
     }
 
     private SearchResult createFoundResult(Vocabulary vocab, Language language,

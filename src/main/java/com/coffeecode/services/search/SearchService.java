@@ -8,15 +8,20 @@ import org.slf4j.LoggerFactory;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
 import com.coffeecode.services.search.result.SearchResult;
+import com.coffeecode.services.search.strategy.BinarySearch;
 import com.coffeecode.services.search.strategy.SearchStrategy;
+import com.coffeecode.services.visualization.observer.DefaultSearchObserver;
+import com.coffeecode.services.visualization.observer.SearchObserver;
 
 public class SearchService implements ISearchService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
     private final SearchStrategy strategy;
+    private SearchObserver observer;
 
     public SearchService(SearchStrategy strategy) {
         this.strategy = strategy;
+        this.observer = new DefaultSearchObserver();
     }
 
     @Override
@@ -30,6 +35,14 @@ public class SearchService implements ISearchService {
 
         logSearchResult(result, startTime, endTime);
         return result;
+    }
+
+    @Override
+    public void setObserver(SearchObserver observer) {
+        this.observer = observer != null ? observer : new DefaultSearchObserver();
+        if (strategy instanceof BinarySearch binarySearch) {
+            binarySearch.setObserver(this.observer);
+        }
     }
 
     private void validateSearchParams(String word, List<Vocabulary> data, Language language) {
