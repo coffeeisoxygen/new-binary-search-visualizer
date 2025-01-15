@@ -2,9 +2,11 @@ package com.coffeecode.services;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,5 +56,13 @@ class DictionaryServiceTest {
 
         // Then
         assertEquals(Arrays.asList("apel", "zebra"), result);
+    }
+
+    @Test
+    void shouldHandleEmptyVocabularyList() throws IOException {
+        when(repository.loadVocabularies(anyString())).thenReturn(Collections.emptyList());
+        service.loadDefaultDictionary();
+        assertTrue(service.getEnglishWords().isEmpty());
+        assertTrue(service.getIndonesianWords().isEmpty());
     }
 }
