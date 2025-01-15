@@ -1,9 +1,9 @@
 package com.coffeecode.viewmodel;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.exception.ExceptionMessages;
 import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
@@ -19,13 +19,13 @@ public class DictionaryViewModel {
         this.isDictionaryLoaded = false;
     }
 
-    public void loadDictionary() throws IOException {
+    public void loadDictionary() throws DictionaryException {
         try {
             dictionary.loadDefaultDictionary();
             isDictionaryLoaded = true;
         } catch (DictionaryException e) {
             isDictionaryLoaded = false;
-            throw new IOException("Failed to load dictionary", e);
+            throw e;
         }
     }
 
@@ -33,32 +33,32 @@ public class DictionaryViewModel {
         return isDictionaryLoaded;
     }
 
-    public List<String> getEnglishWords() {
+    public List<String> getEnglishWords() throws DictionaryException {
         validateDictionaryLoaded();
         return dictionary.getEnglishWords();
     }
 
-    public List<String> getIndonesianWords() {
+    public List<String> getIndonesianWords() throws DictionaryException {
         validateDictionaryLoaded();
         return dictionary.getIndonesianWords();
     }
 
-    public List<Vocabulary> getVocabularies() {
+    public List<Vocabulary> getVocabularies() throws DictionaryException {
         validateDictionaryLoaded();
         return dictionary.getVocabularies();
     }
 
-    public SearchResult search(String word, Language language) {
+    public SearchResult search(String word, Language language) throws DictionaryException {
         validateDictionaryLoaded();
         if (word == null || word.trim().isEmpty()) {
-            throw new IllegalArgumentException("Search word cannot be empty");
+            throw new DictionaryException(ExceptionMessages.ERR_WORD_EMPTY);
         }
         return dictionary.search(word.trim(), language);
     }
 
-    private void validateDictionaryLoaded() {
+    private void validateDictionaryLoaded() throws DictionaryException {
         if (!isDictionaryLoaded) {
-            throw new IllegalStateException("Dictionary not loaded. Call loadDictionary() first");
+            throw new DictionaryException(ExceptionMessages.ERR_DICT_NOT_LOADED);
         }
     }
 }

@@ -1,12 +1,18 @@
 package com.coffeecode;
 
-import java.io.IOException;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.coffeecode.model.*;
-import com.coffeecode.search.*;
+import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.model.Dictionary;
+import com.coffeecode.model.FileService;
+import com.coffeecode.model.IDictionary;
+import com.coffeecode.model.Language;
+import com.coffeecode.search.BinarySearch;
+import com.coffeecode.search.SearchResult;
+import com.coffeecode.search.SearchStrategy;
 import com.coffeecode.viewmodel.DictionaryViewModel;
 
 public class App {
@@ -17,7 +23,7 @@ public class App {
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_BLUE = "\u001B[34m";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws DictionaryException {
         // Initialize components
         SearchStrategy searchStrategy = new BinarySearch();
         FileService fileService = new FileService();
@@ -28,7 +34,7 @@ public class App {
         try {
             viewModel.loadDictionary();
             logger.info("Dictionary loaded successfully");
-        } catch (IOException e) {
+        } catch (DictionaryException e) {
             logger.error("Failed to load dictionary: {}", e.getMessage());
             return;
         }

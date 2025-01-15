@@ -13,12 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.exception.ExceptionMessages;
 
 class FileServiceTest {
 
     private FileService fileService;
     @TempDir
     File tempDir;
+
     private static final String VALID_JSON = """
             {
                 "vocabulary": [
@@ -28,66 +30,85 @@ class FileServiceTest {
             }
             """;
 
+    private static final String INVALID_JSON = """
+            {
+                "vocabulary": "not-an-array"
+            }
+            """;
+
     @BeforeEach
     void setUp() {
         fileService = new FileService();
     }
 
+    // File Validation Tests
     @Test
     void loadVocabularies_WithNullPath_ShouldThrowException() {
-        DictionaryException exception = assertThrows(
+        var exception = assertThrows(
                 DictionaryException.class,
                 () -> fileService.loadVocabularies(null)
         );
-        assertEquals(
-                "Dictionary Error: File path cannot be empty",
-                exception.getMessage()
-        );
+        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
     }
 
     @Test
     void loadVocabularies_WithEmptyPath_ShouldThrowException() {
-        DictionaryException exception = assertThrows(
+        var exception = assertThrows(
                 DictionaryException.class,
                 () -> fileService.loadVocabularies("  ")
         );
-        assertEquals(
-                "Dictionary Error: File path cannot be empty",
-                exception.getMessage()
-        );
+        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
     }
 
     @Test
-    void loadVocabularies_WithValidJson_ShouldReturnVocabularyList() throws IOException {
-        File testFile = new File(tempDir, "test-dict.json");
-        Files.writeString(testFile.toPath(), VALID_JSON);
+    void loadVocabularies_WithNonexistentFile_ShouldThrowException() {
+        var exception = assertThrows(
+                DictionaryException.class,
+                () -> fileService.loadVocabularies("nonexistent.json")
+        );
+        assertTrue(exception.getMessage().startsWith(ExceptionMessages.ERR_FILE_NOT_FOUND));
+    }
 
+    // JSON Parsing Tests
+    @Test
+    void loadVocabularies_WithValidJson_ShouldReturnVocabularyList() throws IOException {
+        File testFile = createTestFile("valid.json", VALID_JSON);
         List<Vocabulary> result = fileService.loadVocabularies(testFile.getAbsolutePath());
 
         assertEquals(2, result.size());
-        assertEquals("cat", result.get(0).english());
-        assertEquals("kucing", result.get(0).indonesian());
-    }
-
-    @Test
-    void loadDefaultDictionary_ShouldThrowException_WhenFileNotFound() {
-        DictionaryException exception = assertThrows(
-                DictionaryException.class,
-                () -> fileService.loadDefaultDictionary()
-        );
-        assertTrue(exception.getMessage().startsWith("Dictionary Error: File not found:"));
-        assertTrue(exception.getMessage().endsWith("vocabulary.json"));
+        assertVocabulary(result.get(0), "cat", "kucing");
+        assertVocabulary(result.get(1), "dog", "anjing");
     }
 
     @Test
     void loadVocabularies_WithInvalidJson_ShouldThrowException() throws IOException {
-        File testFile = new File(tempDir, "invalid.json");
-        Files.writeString(testFile.toPath(), "{\"vocabulary\": \"not-an-array\"}");
-
-        DictionaryException exception = assertThrows(
+        File testFile = createTestFile("invalid.json", INVALID_JSON);
+        var exception = assertThrows(
                 DictionaryException.class,
                 () -> fileService.loadVocabularies(testFile.getAbsolutePath())
         );
-        assertTrue(exception.getMessage().contains("Dictionary Error: Invalid JSON structure"));
+        assertTrue(exception.getMessage().contains("Invalid JSON structure"));
+    }
+
+    // Default Dictionary Tests
+    @Test
+    void loadDefaultDictionary_WhenFileNotFound_ShouldThrowException() {
+        var exception = assertThrows(
+                DictionaryException.class,
+                () -> fileService.loadDefaultDictionary()
+        );
+        assertTrue(exception.getMessage().startsWith(ExceptionMessages.ERR_FILE_NOT_FOUND));
+    }
+
+    // Helper Methods
+    private File createTestFile(String filename, String content) throws IOException {
+        File testFile = new File(tempDir, filename);
+        Files.writeString(testFile.toPath(), content);
+        return testFile;
+    }
+
+    private void assertVocabulary(Vocabulary vocabulary, String english, String indonesian) {
+        assertEquals(english, vocabulary.english());
+        assertEquals(indonesian, vocabulary.indonesian());
     }
 }

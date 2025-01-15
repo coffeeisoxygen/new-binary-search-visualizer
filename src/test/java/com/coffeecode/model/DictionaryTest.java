@@ -1,23 +1,23 @@
 package com.coffeecode.model;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
 import com.coffeecode.exception.DictionaryException;
+import com.coffeecode.exception.ExceptionMessages;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
 
-public class DictionaryTest {
+class DictionaryTest {
 
     private static final String INDONESIAN_CAT = "kucing";
     private static final String INDONESIAN_DOG = "anjing";
@@ -41,91 +41,69 @@ public class DictionaryTest {
 
     // Loading Tests
     @Test
-    void loadDefaultDictionary_ShouldLoadVocabularies() throws DictionaryException, IOException {
+    void loadDefaultDictionary_ShouldLoadVocabularies() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
         assertEquals(testVocabularies, dictionary.getVocabularies());
     }
 
     @Test
-    void loadDictionaryWithInvalidPathShouldThrowException() throws DictionaryException {
-        // Setup mock behavior
-        when(fileService.loadVocabularies("invalid/path"))
-                .thenThrow(new IOException("File not found: invalid/path"));
-
-        // Execute and verify
-        IOException exception = assertThrows(
-                IOException.class,
-                () -> dictionary.loadVocabularies("invalid/path")
-        );
-
-        // Verify exact message
-        assertEquals("File not found: invalid/path", exception.getMessage());
-
-        // Verify mock was called
-        verify(fileService).loadVocabularies("invalid/path");
-    }
-
-    @Test
     void loadDictionary_WithNullPath_ShouldThrowException() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
                 () -> dictionary.loadVocabularies(null)
         );
-        assertEquals("File path cannot be empty", exception.getMessage());
+        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
     }
 
     @Test
     void loadDictionary_WithEmptyPath_ShouldThrowException() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
                 () -> dictionary.loadVocabularies("")
         );
-        assertEquals("File path cannot be empty", exception.getMessage());
+        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
     }
 
     @Test
-    void loadDictionary_WithInvalidPath_ShouldThrowException() throws DictionaryException {
+    void loadDictionary_WithInvalidPath_ShouldThrowException() {
         when(fileService.loadVocabularies("invalid/path"))
-                .thenThrow(new IOException("File not found: invalid/path"));
+                .thenThrow(new DictionaryException(ExceptionMessages.ERR_FILE_NOT_FOUND.formatted("invalid/path")));
 
-        IOException exception = assertThrows(
-                IOException.class,
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
                 () -> dictionary.loadVocabularies("invalid/path")
         );
-        assertEquals("File not found: invalid/path", exception.getMessage());
+        assertTrue(exception.getMessage().contains("File not found:"));
     }
 
+    // Word List Tests
     @Test
-    void loadDictionary_WithInvalidJson_ShouldThrowException() throws DictionaryException {
-        when(fileService.loadVocabularies("invalid.json"))
-                .thenThrow(new IOException("Invalid file format: missing vocabulary array"));
-
-        IOException exception = assertThrows(
-                IOException.class,
-                () -> dictionary.loadVocabularies("invalid.json")
-        );
-        assertEquals("Invalid file format: missing vocabulary array", exception.getMessage());
-    }
-
-    // Word List Tests  
-    @Test
-    void getEnglishWords_ShouldReturnSortedList() throws IOException {
+    void getEnglishWords_ShouldReturnSortedList() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
         assertEquals(Arrays.asList("cat", "dog"), dictionary.getEnglishWords());
     }
 
     @Test
-    void getIndonesianWords_ShouldReturnSortedList() throws IOException {
+    void getIndonesianWords_ShouldReturnSortedList() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
         assertEquals(Arrays.asList("anjing", "kucing"), dictionary.getIndonesianWords());
     }
 
+    @Test
+    void getWords_WithoutLoadingDictionary_ShouldThrowException() {
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> dictionary.getEnglishWords()
+        );
+        assertEquals(ExceptionMessages.ERR_DICT_NOT_LOADED, exception.getMessage());
+    }
+
     // Search Tests
     @Test
-    void search_ExistingWord_ShouldReturnResult() throws IOException {
+    void search_ExistingWord_ShouldReturnResult() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
 
@@ -137,7 +115,7 @@ public class DictionaryTest {
     }
 
     @Test
-    void search_NonexistentWord_ShouldReturnNotFound() throws IOException {
+    void search_NonexistentWord_ShouldReturnNotFound() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
 
