@@ -9,7 +9,7 @@ import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
 import com.coffeecode.services.dictionary.IDictionaryService;
 import com.coffeecode.services.search.result.SearchResult;
-import com.coffeecode.services.visualization.ISearchConfigurable;
+import com.coffeecode.services.visualization.observer.ISearchConfigurable;
 import com.coffeecode.services.visualization.observer.SearchObserver;
 
 public class DictionaryViewModel implements ISearchConfigurable {

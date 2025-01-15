@@ -1,4 +1,4 @@
-package com.coffeecode.services.visualization;
+package com.coffeecode.services.search.strategy;
 
 import java.util.List;
 
