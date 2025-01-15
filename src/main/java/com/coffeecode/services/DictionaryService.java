@@ -26,14 +26,18 @@ public class DictionaryService {
     public List<String> getEnglishWords() {
         return vocabularies.stream()
                 .map(Vocabulary::english)
-                .sorted(String.CASE_INSENSITIVE_ORDER) // Sorting logic moved here
+                .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList();
     }
 
     public List<String> getIndonesianWords() {
         return vocabularies.stream()
                 .map(Vocabulary::indonesian)
-                .sorted(String.CASE_INSENSITIVE_ORDER) // Sorting logic moved here
+                .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList();
+    }
+
+    public List<Vocabulary> getVocabularies() {
+        return vocabularies;
     }
 }

@@ -3,6 +3,7 @@ package com.coffeecode.viewmodel;
 import java.io.IOException;
 import java.util.List;
 
+import com.coffeecode.model.Vocabulary;
 import com.coffeecode.repository.DictionaryRepository;
 import com.coffeecode.services.DictionaryService;
 
@@ -23,5 +24,9 @@ public class DictionaryViewModel {
 
     public List<String> getIndonesianWords() {
         return service.getIndonesianWords();
+    }
+
+    public List<Vocabulary> getVocabularies() {
+        return service.getVocabularies();
     }
 }
