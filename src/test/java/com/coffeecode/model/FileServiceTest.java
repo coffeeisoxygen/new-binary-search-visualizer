@@ -114,7 +114,7 @@ class FileServiceTest {
                 () -> fileService.loadDefaultDictionary()
         );
 
-        String expectedMessage = String.format(ExceptionMessages.ERR_DEFAULT_DICT_NOT_FOUND, DEFAULT_DICTIONARY_PATH);
+        String expectedMessage = String.format(ExceptionMessages.ERR_FILE_NOT_FOUND, DEFAULT_DICTIONARY_PATH);
         String actualMessage = exception.getMessage();
 
         // Add debug output
