@@ -20,7 +20,7 @@ public class Dictionary implements IDictionary {
 
     @Override
     public void loadDefaultDictionary() throws DictionaryException {
-        this.vocabularies = fileService.loadDefaultDictionary();
+        this.vocabularies = sortVocabularies(fileService.loadDefaultDictionary());
     }
 
     @Override
@@ -31,7 +31,7 @@ public class Dictionary implements IDictionary {
                     "File path cannot be empty"
             );
         }
-        this.vocabularies = fileService.loadVocabularies(filePath);
+        this.vocabularies = sortVocabularies(fileService.loadVocabularies(filePath));
     }
 
     @Override
@@ -49,7 +49,13 @@ public class Dictionary implements IDictionary {
     private List<String> getWordsByLanguage(Language language) {
         return vocabularies.stream()
                 .map(language::getWord)
-                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList(); // Remove sorting here as list is already sorted
+    }
+
+    private List<Vocabulary> sortVocabularies(List<Vocabulary> unsorted) {
+        return unsorted.stream()
+                .sorted((v1, v2) -> String.CASE_INSENSITIVE_ORDER.compare(
+                v1.english().toLowerCase(), v2.english().toLowerCase()))
                 .toList();
     }
 

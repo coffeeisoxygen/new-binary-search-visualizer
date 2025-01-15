@@ -1,6 +1,5 @@
 package com.coffeecode.search;
 
-import java.util.Comparator;
 import java.util.List;
 
 import com.coffeecode.model.Language;
@@ -14,20 +13,16 @@ public class BinarySearch implements SearchStrategy {
             throw new IllegalArgumentException("Search word cannot be empty");
         }
 
-        List<Vocabulary> sortedData = data.stream()
-                .sorted(Comparator.comparing(language::getWord, String.CASE_INSENSITIVE_ORDER))
-                .toList();
-
-        if (sortedData.isEmpty()) {
+        if (data.isEmpty()) {
             return new SearchResult(false, word, "");
         }
 
         int left = 0;
-        int right = sortedData.size() - 1;
+        int right = data.size() - 1;
 
         while (left <= right) {
             int mid = left + (right - left) / 2;
-            Vocabulary current = sortedData.get(mid);
+            Vocabulary current = data.get(mid);  // Change sortedData to data
             String currentWord = language.getWord(current);
 
             int comparison = currentWord.compareToIgnoreCase(word);
