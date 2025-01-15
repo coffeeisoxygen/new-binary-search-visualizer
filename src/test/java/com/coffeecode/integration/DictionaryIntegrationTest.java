@@ -38,7 +38,12 @@ class DictionaryIntegrationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        File testFile = createTestFile("dictionary.json", VALID_JSON);
+        // Create test file in target/test-classes
+        File testDir = new File("target/test-classes");
+        testDir.mkdirs();
+        File testFile = new File(testDir, "test-dictionary.json");
+        Files.writeString(testFile.toPath(), VALID_JSON);
+        
         IFileService fileService = new FileService(testFile.getPath());
         IJsonService jsonService = new JsonService();
         SearchStrategy searchStrategy = new BinarySearch();

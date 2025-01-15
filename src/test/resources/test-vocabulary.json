@@ -1,6 +1,7 @@
 {
     "vocabulary": [
         {"english": "cat", "indonesian": "kucing"},
-        {"english": "dog", "indonesian": "anjing"}
+        {"english": "dog", "indonesian": "anjing"},
+        {"english": "fish", "indonesian": "ikan"}
     ]
 }
