@@ -1,8 +1,11 @@
 package com.coffeecode;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coffeecode.exception.DictionaryException;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.SearchResult;
 import com.coffeecode.repository.DictionaryRepository;
@@ -18,15 +21,15 @@ public class App {
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_BLUE = "\u001B[34m";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
             runDemonstration();
-        } catch (Exception e) {
+        } catch (DictionaryException e) {
             logger.error("Application error", e);
         }
     }
 
-    private static void runDemonstration() throws Exception {
+    private static void runDemonstration() throws DictionaryException, IOException {
         DictionaryRepository repository = new JsonDictionaryRepository();
         DictionaryViewModel viewModel = new DictionaryViewModel(repository);
         viewModel.loadDictionary();
