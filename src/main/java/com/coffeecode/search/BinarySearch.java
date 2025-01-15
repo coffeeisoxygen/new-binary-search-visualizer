@@ -1,7 +1,10 @@
 package com.coffeecode.search;
 
-import com.coffeecode.model.*;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+
+import com.coffeecode.model.Language;
+import com.coffeecode.model.Vocabulary;
 
 public class BinarySearch implements SearchStrategy {
 

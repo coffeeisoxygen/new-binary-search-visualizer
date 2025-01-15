@@ -8,18 +8,14 @@ import com.coffeecode.exception.ErrorCode;
  */
 public record Vocabulary(String english, String indonesian) {
 
-    public Vocabulary  {
-        if (english == null || english.isBlank()) {
-            throw new DictionaryException(
-                    ErrorCode.INVALID_WORD,
-                    "English word cannot be empty"
-            );
+    public static Vocabulary create(String english, String indonesian) throws DictionaryException {
+        if (english == null || english.trim().isEmpty()) {
+            throw new DictionaryException(ErrorCode.INVALID_WORD, "English word cannot be empty");
         }
-        if (indonesian == null || indonesian.isBlank()) {
-            throw new DictionaryException(
-                    ErrorCode.INVALID_WORD,
-                    "Indonesian word cannot be empty"
-            );
+        if (indonesian == null || indonesian.trim().isEmpty()) {
+            throw new DictionaryException(ErrorCode.INVALID_WORD, "Indonesian word cannot be empty");
         }
+        return new Vocabulary(english, indonesian);
+
     }
 }

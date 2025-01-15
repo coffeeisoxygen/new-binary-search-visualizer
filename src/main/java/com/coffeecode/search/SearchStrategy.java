@@ -1,8 +1,9 @@
 package com.coffeecode.search;
 
-import com.coffeecode.model.Vocabulary;
-import com.coffeecode.model.Language;
 import java.util.List;
+
+import com.coffeecode.model.Language;
+import com.coffeecode.model.Vocabulary;
 
 public interface SearchStrategy {
 
