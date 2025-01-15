@@ -15,13 +15,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JsonService {
+public class JsonService implements IJsonService {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final int MAX_VOCABULARY_SIZE = 1000;
     private static final int MAX_WORD_LENGTH = 50;
 
+    @Override
     public List<Vocabulary> parseVocabularyFile(File file) throws DictionaryException {
         try {
             JsonNode root = objectMapper.readTree(file);

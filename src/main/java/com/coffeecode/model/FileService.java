@@ -13,24 +13,36 @@ import com.coffeecode.exception.ErrorCode;
 public class FileService implements IFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit
+    private static final long DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/vocabulary.json";
-    private final String defaultDictionaryPath;
-    private final JsonService jsonService;
+
+    private final String dictionaryPath;
+    private final long maxFileSize;
+    private final IJsonService jsonService;
 
     public FileService() {
-        this(DEFAULT_DICTIONARY_PATH);
+        this(DEFAULT_DICTIONARY_PATH, DEFAULT_MAX_FILE_SIZE, new JsonService());
     }
 
-    public FileService(String defaultDictionaryPath) {
-        this.defaultDictionaryPath = defaultDictionaryPath;
-        this.jsonService = new JsonService();
+    public FileService(String dictionaryPath) {
+        this(dictionaryPath, DEFAULT_MAX_FILE_SIZE, new JsonService());
+    }
+
+    public FileService(String dictionaryPath, long maxFileSize) {
+        this(dictionaryPath, maxFileSize, new JsonService());
+    }
+
+    public FileService(String dictionaryPath, long maxFileSize, IJsonService jsonService) {
+        this.dictionaryPath = dictionaryPath;
+        this.maxFileSize = maxFileSize;
+        this.jsonService = jsonService;
+        logger.info("Initialized FileService with dictionary path: {}", dictionaryPath);
     }
 
     @Override
     public List<Vocabulary> loadDefaultDictionary() throws DictionaryException {
-        logger.info("Loading default dictionary from: {}", defaultDictionaryPath);
-        return loadVocabularies(defaultDictionaryPath);
+        logger.info("Loading default dictionary from: {}", dictionaryPath);
+        return loadVocabularies(dictionaryPath);
     }
 
     @Override
@@ -69,10 +81,10 @@ public class FileService implements IFileService {
     }
 
     private void validateFileSize(File file) {
-        if (file.length() > MAX_FILE_SIZE) {
+        if (file.length() > maxFileSize) {
             throw new DictionaryException(
                     ErrorCode.FILE_TOO_LARGE,
-                    String.format("File size exceeds maximum limit of %d MB", MAX_FILE_SIZE / (1024 * 1024))
+                    String.format("File size exceeds maximum limit of %d MB", maxFileSize / (1024 * 1024))
             );
         }
     }

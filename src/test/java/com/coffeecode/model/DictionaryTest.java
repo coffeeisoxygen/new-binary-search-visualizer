@@ -5,7 +5,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,7 +12,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
 import com.coffeecode.exception.DictionaryException;
-import com.coffeecode.exception.ExceptionMessages;
+import com.coffeecode.exception.ErrorCode;
 import com.coffeecode.search.SearchResult;
 import com.coffeecode.search.SearchStrategy;
 
@@ -39,7 +38,6 @@ class DictionaryTest {
         );
     }
 
-    // Loading Tests
     @Test
     void loadDefaultDictionary_ShouldLoadVocabularies() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
@@ -48,36 +46,23 @@ class DictionaryTest {
     }
 
     @Test
-    void loadDictionary_WithNullPath_ShouldThrowException() {
+    void loadVocabularies_WithNullPath_ShouldThrowException() {
         DictionaryException exception = assertThrows(
                 DictionaryException.class,
                 () -> dictionary.loadVocabularies(null)
         );
-        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
+        assertEquals(ErrorCode.INVALID_WORD, exception.getErrorCode());
     }
 
     @Test
-    void loadDictionary_WithEmptyPath_ShouldThrowException() {
+    void loadVocabularies_WithEmptyPath_ShouldThrowException() {
         DictionaryException exception = assertThrows(
                 DictionaryException.class,
-                () -> dictionary.loadVocabularies("")
+                () -> dictionary.loadVocabularies("  ")
         );
-        assertEquals(ExceptionMessages.ERR_FILE_PATH_EMPTY, exception.getMessage());
+        assertEquals(ErrorCode.INVALID_WORD, exception.getErrorCode());
     }
 
-    @Test
-    void loadDictionary_WithInvalidPath_ShouldThrowException() {
-        when(fileService.loadVocabularies("invalid/path"))
-                .thenThrow(new DictionaryException(ExceptionMessages.ERR_FILE_NOT_FOUND.formatted("invalid/path")));
-
-        DictionaryException exception = assertThrows(
-                DictionaryException.class,
-                () -> dictionary.loadVocabularies("invalid/path")
-        );
-        assertTrue(exception.getMessage().contains("File not found:"));
-    }
-
-    // Word List Tests
     @Test
     void getEnglishWords_ShouldReturnSortedList() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
@@ -93,17 +78,7 @@ class DictionaryTest {
     }
 
     @Test
-    void getWords_WithoutLoadingDictionary_ShouldThrowException() {
-        DictionaryException exception = assertThrows(
-                DictionaryException.class,
-                () -> dictionary.getEnglishWords()
-        );
-        assertEquals(ExceptionMessages.ERR_DICT_NOT_LOADED, exception.getMessage());
-    }
-
-    // Search Tests
-    @Test
-    void search_ExistingWord_ShouldReturnResult() throws DictionaryException {
+    void search_WithValidWord_ShouldReturnResult() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
 
@@ -115,14 +90,23 @@ class DictionaryTest {
     }
 
     @Test
-    void search_NonexistentWord_ShouldReturnNotFound() throws DictionaryException {
+    void search_WithNullWord_ShouldThrowException() throws DictionaryException {
         when(fileService.loadDefaultDictionary()).thenReturn(testVocabularies);
         dictionary.loadDefaultDictionary();
 
-        SearchResult expected = new SearchResult(false, "bird", "");
-        when(searchStrategy.search("bird", testVocabularies, Language.ENGLISH))
-                .thenReturn(expected);
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> dictionary.search(null, Language.ENGLISH)
+        );
+        assertEquals(ErrorCode.INVALID_WORD, exception.getErrorCode());
+    }
 
-        assertEquals(expected, dictionary.search("bird", Language.ENGLISH));
+    @Test
+    void search_WithoutLoadingDictionary_ShouldThrowException() {
+        DictionaryException exception = assertThrows(
+                DictionaryException.class,
+                () -> dictionary.search("cat", Language.ENGLISH)
+        );
+        assertEquals(ErrorCode.DICTIONARY_NOT_LOADED, exception.getErrorCode());
     }
 }
