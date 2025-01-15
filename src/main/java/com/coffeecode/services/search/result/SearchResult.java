@@ -1,4 +1,4 @@
-package com.coffeecode.search;
+package com.coffeecode.services.search.result;
 
 public record SearchResult(
         boolean found,

@@ -2,77 +2,37 @@ package com.coffeecode.viewmodel;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.coffeecode.exception.DictionaryException;
-import com.coffeecode.exception.ErrorCode;
-import com.coffeecode.exception.ErrorHandler;
-import com.coffeecode.exception.ErrorResponse;
-import com.coffeecode.model.IDictionary;
 import com.coffeecode.model.Language;
-import com.coffeecode.model.Vocabulary;
-import com.coffeecode.search.SearchResult;
+import com.coffeecode.services.dictionary.IDictionaryService;
+import com.coffeecode.services.search.result.SearchResult;
 
 public class DictionaryViewModel {
 
-    private final IDictionary dictionary;
-    private boolean isDictionaryLoaded;
+    private static final Logger logger = LoggerFactory.getLogger(DictionaryViewModel.class);
+    private final IDictionaryService dictionaryService;
 
-    public DictionaryViewModel(IDictionary dictionary) {
-        this.dictionary = dictionary;
-        this.isDictionaryLoaded = false;
-    }
-
-    public void loadDictionary() {
-        try {
-            dictionary.loadDefaultDictionary();
-            isDictionaryLoaded = true;
-        } catch (Exception e) {
-            isDictionaryLoaded = false;
-            ErrorResponse response = ErrorHandler.handle(e);
-            // Handle UI response based on error type
-            if (response.requiresUserAction()) {
-                // Show user message and action required
-                System.out.println(response.userMessage());
-                System.out.println("Action required: " + response.actionRequired());
-            }
-        }
-    }
-
-    public boolean isDictionaryLoaded() {
-        return isDictionaryLoaded;
-    }
-
-    public List<String> getEnglishWords() throws DictionaryException {
-        validateDictionaryLoaded();
-        return dictionary.getEnglishWords();
-    }
-
-    public List<String> getIndonesianWords() throws DictionaryException {
-        validateDictionaryLoaded();
-        return dictionary.getIndonesianWords();
-    }
-
-    public List<Vocabulary> getVocabularies() throws DictionaryException {
-        validateDictionaryLoaded();
-        return dictionary.getVocabularies();
+    public DictionaryViewModel(IDictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
     }
 
     public SearchResult search(String word, Language language) {
-        validateDictionaryLoaded();
-        if (word == null || word.trim().isEmpty()) {
-            throw new DictionaryException(
-                    ErrorCode.INVALID_WORD,
-                    "Search word cannot be empty"
-            );
+        try {
+            return dictionaryService.search(word, language);
+        } catch (DictionaryException e) {
+            logger.error("Search failed: {}", e.getMessage());
+            throw e;
         }
-        return dictionary.search(word.trim(), language);
     }
 
-    private void validateDictionaryLoaded() {
-        if (!isDictionaryLoaded) {
-            throw new DictionaryException(
-                    ErrorCode.DICTIONARY_NOT_LOADED,
-                    "Dictionary not loaded. Please load a dictionary first."
-            );
-        }
+    public List<String> getWordsByLanguage(Language language) {
+        return dictionaryService.getWordsByLanguage(language);
+    }
+
+    public boolean isLoaded() {
+        return dictionaryService.isInitialized();
     }
 }

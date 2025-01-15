@@ -1,10 +1,12 @@
-package com.coffeecode.model;
+package com.coffeecode.services.dictionary;
 
 import java.util.List;
 
+import com.coffeecode.model.Language;
+import com.coffeecode.model.Vocabulary;
 import com.coffeecode.services.search.result.SearchResult;
 
-public interface IDictionary {
+public interface IDictionaryService {
 
     SearchResult search(String word, Language language);
 
@@ -13,4 +15,6 @@ public interface IDictionary {
     List<Vocabulary> getVocabularies();
 
     int size();
+
+    boolean isInitialized();
 }

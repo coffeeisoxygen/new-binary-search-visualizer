@@ -1,13 +1,12 @@
 package com.coffeecode.services.file;
 
-import java.util.List;
+import java.io.File;
 
 import com.coffeecode.exception.DictionaryException;
-import com.coffeecode.model.Vocabulary;
 
 public interface IFileService {
 
-    List<Vocabulary> loadDefaultDictionary() throws DictionaryException;
+    File getDefaultDictionaryFile() throws DictionaryException;
+    File getFile(String filePath) throws DictionaryException;
 
-    List<Vocabulary> loadVocabularies(String filePath) throws DictionaryException;
 }

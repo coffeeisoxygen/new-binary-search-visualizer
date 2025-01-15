@@ -13,13 +13,22 @@ public enum ErrorCode {
     DUPLICATE_ENTRY("DICT005", "Duplicate Word"),
     INVALID_WORD("DICT006", "Invalid Word"),
     DICTIONARY_NOT_LOADED("DICT007", "Dictionary Not Loaded"),
+    // process related errors
+    INVALID_DICTIONARY("DICT008", "Invalid Dictionary"),
+    INVALID_CONFIGURATION("DICT009", "Invalid Configuration"),
+    INITIALIZATION_ERROR("DICT010", "Initialization Error"),
+    // Search related errors
+    WORD_NOT_FOUND("DICT010", "Word Not Found"),
+    // Sort related errors
+    INVALID_SORT("DICT011", "Invalid Sort"),
     // General errors
     UNKNOWN_ERROR("DICT999", "Unknown Error");
 
     private final String code;
     private final String defaultMessage;
 
-    ErrorCode(String code, String defaultMessage) {
+    ErrorCode(String code, String defaultMessage
+    ) {
         this.code = code;
         this.defaultMessage = defaultMessage;
     }
