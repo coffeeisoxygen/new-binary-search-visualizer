@@ -3,6 +3,8 @@ package com.coffeecode.viewmodel;
 import java.io.IOException;
 import java.util.List;
 
+import com.coffeecode.model.Language;
+import com.coffeecode.model.SearchResult;
 import com.coffeecode.model.Vocabulary;
 import com.coffeecode.repository.DictionaryRepository;
 import com.coffeecode.services.DictionaryService;
@@ -28,5 +30,9 @@ public class DictionaryViewModel {
 
     public List<Vocabulary> getVocabularies() {
         return service.getVocabularies();
+    }
+
+    public SearchResult search(String word, Language language) {
+        return service.search(word, language);
     }
 }

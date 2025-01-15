@@ -3,6 +3,8 @@ package com.coffeecode.services;
 import java.io.IOException;
 import java.util.List;
 
+import com.coffeecode.model.Language;
+import com.coffeecode.model.SearchResult;
 import com.coffeecode.model.Vocabulary;
 import com.coffeecode.repository.DictionaryRepository;
 
@@ -39,5 +41,10 @@ public class DictionaryService {
 
     public List<Vocabulary> getVocabularies() {
         return vocabularies;
+    }
+
+    public SearchResult search(String word, Language language) {
+        BinarySearch binarySearch = new BinarySearch(vocabularies, language);
+        return binarySearch.search(word);
     }
 }
