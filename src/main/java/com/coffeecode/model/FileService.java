@@ -48,10 +48,13 @@ public class FileService implements IFileService {
 
         File file = new File(filePath);
         if (!file.exists()) {
-            String absolutePath = file.getAbsolutePath();
-            String errorMessage = String.format(ExceptionMessages.ERR_FILE_NOT_FOUND, absolutePath);
+
+            String errorMessage = String.format(ExceptionMessages.ERR_FILE_NOT_FOUND, filePath);
+
             logger.error(errorMessage);
+
             throw new DictionaryException(errorMessage);
+
         }
         if (!file.canRead()) {
             throw new DictionaryException(String.format(ExceptionMessages.ERR_FILE_NOT_READABLE, file.getAbsolutePath()));
