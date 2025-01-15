@@ -18,30 +18,100 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JsonService {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonService.class);
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final int MAX_VOCABULARY_SIZE = 1000;
+    private static final int MAX_WORD_LENGTH = 50;
 
     public List<Vocabulary> parseVocabularyFile(File file) throws DictionaryException {
-        JsonNode vocabularyArray = parseAndValidateJson(file);
-        return convertToVocabularyList(vocabularyArray, file.getPath());
-    }
-
-    private JsonNode parseAndValidateJson(File file) throws DictionaryException {
         try {
             JsonNode root = objectMapper.readTree(file);
+            validateJsonStructure(root);
             JsonNode vocabularyArray = root.get("vocabulary");
-
-            if (vocabularyArray == null || !vocabularyArray.isArray()) {
-                throw new DictionaryException(
-                        ErrorCode.INVALID_JSON,
-                        "Invalid JSON structure: missing vocabulary array"
-                );
-            }
-
-            return vocabularyArray;
+            return convertToVocabularyList(vocabularyArray, file.getPath());
         } catch (IOException e) {
             throw new DictionaryException(
                     ErrorCode.INVALID_JSON,
                     "Failed to read JSON file: " + e.getMessage()
+            );
+        }
+    }
+
+    private void validateJsonStructure(JsonNode root) {
+        if (root == null || !root.has("vocabulary")) {
+            throw new DictionaryException(
+                    ErrorCode.INVALID_JSON,
+                    "Invalid JSON: missing vocabulary array"
+            );
+        }
+
+        JsonNode vocabularyArray = root.get("vocabulary");
+        validateVocabularyArray(vocabularyArray);
+        validateArraySize(vocabularyArray);
+        validateArrayEntries(vocabularyArray);
+    }
+
+    private void validateVocabularyArray(JsonNode vocabularyArray) {
+        if (!vocabularyArray.isArray()) {
+            throw new DictionaryException(
+                    ErrorCode.INVALID_JSON,
+                    "Invalid JSON: vocabulary must be an array"
+            );
+        }
+
+        if (vocabularyArray.size() == 0) {
+            throw new DictionaryException(
+                    ErrorCode.INVALID_JSON,
+                    "Invalid JSON: vocabulary array cannot be empty"
+            );
+        }
+    }
+
+    private void validateArraySize(JsonNode vocabularyArray) {
+        if (vocabularyArray.size() > MAX_VOCABULARY_SIZE) {
+            throw new DictionaryException(
+                    ErrorCode.FILE_TOO_LARGE,
+                    String.format("Vocabulary size exceeds limit of %d entries", MAX_VOCABULARY_SIZE)
+            );
+        }
+    }
+
+    private void validateArrayEntries(JsonNode vocabularyArray) {
+        for (JsonNode entry : vocabularyArray) {
+            if (!entry.has("english") || !entry.has("indonesian")) {
+                throw new DictionaryException(
+                        ErrorCode.INVALID_JSON,
+                        "Invalid JSON: each entry must have english and indonesian fields"
+                );
+            }
+
+            String english = entry.get("english").asText();
+            String indonesian = entry.get("indonesian").asText();
+
+            if (!isValidWord(english) || !isValidWord(indonesian)) {
+                throw new DictionaryException(
+                        ErrorCode.INVALID_JSON,
+                        "Invalid JSON: words must contain only letters, spaces, and hyphens"
+                );
+            }
+
+            validateWordLength(english, "English");
+            validateWordLength(indonesian, "Indonesian");
+        }
+    }
+
+    private boolean isValidWord(String word) {
+        return word != null
+                && !word.isBlank()
+                && word.length() <= MAX_WORD_LENGTH
+                && word.matches("^[a-zA-Z\\s-]+$");
+    }
+
+    private void validateWordLength(String word, String language) {
+        if (word.length() > MAX_WORD_LENGTH) {
+            throw new DictionaryException(
+                    ErrorCode.INVALID_WORD,
+                    String.format("%s word exceeds maximum length of %d characters: %s",
+                            language, MAX_WORD_LENGTH, word)
             );
         }
     }
@@ -64,42 +134,26 @@ public class JsonService {
     }
 
     private void validateVocabularies(List<Vocabulary> vocabularies) {
+        checkDuplicates(vocabularies);
+    }
+
+    private void checkDuplicates(List<Vocabulary> vocabularies) {
         Set<String> englishWords = new HashSet<>();
         Set<String> indonesianWords = new HashSet<>();
 
         for (Vocabulary vocab : vocabularies) {
-            validateVocabulary(vocab);
-            checkDuplicate(vocab, englishWords, indonesianWords);
-        }
-    }
-
-    private void validateVocabulary(Vocabulary vocab) {
-        if (vocab.english() == null || vocab.english().isBlank()) {
-            throw new DictionaryException(
-                    ErrorCode.INVALID_WORD,
-                    "English word cannot be empty"
-            );
-        }
-        if (vocab.indonesian() == null || vocab.indonesian().isBlank()) {
-            throw new DictionaryException(
-                    ErrorCode.INVALID_WORD,
-                    "Indonesian word cannot be empty"
-            );
-        }
-    }
-
-    private void checkDuplicate(Vocabulary vocab, Set<String> englishWords, Set<String> indonesianWords) {
-        if (!englishWords.add(vocab.english().toLowerCase())) {
-            throw new DictionaryException(
-                    ErrorCode.DUPLICATE_ENTRY,
-                    "Duplicate English word found: " + vocab.english()
-            );
-        }
-        if (!indonesianWords.add(vocab.indonesian().toLowerCase())) {
-            throw new DictionaryException(
-                    ErrorCode.DUPLICATE_ENTRY,
-                    "Duplicate Indonesian word found: " + vocab.indonesian()
-            );
+            if (!englishWords.add(vocab.english().toLowerCase())) {
+                throw new DictionaryException(
+                        ErrorCode.DUPLICATE_ENTRY,
+                        String.format("Duplicate English word found: %s", vocab.english())
+                );
+            }
+            if (!indonesianWords.add(vocab.indonesian().toLowerCase())) {
+                throw new DictionaryException(
+                        ErrorCode.DUPLICATE_ENTRY,
+                        String.format("Duplicate Indonesian word found: %s", vocab.indonesian())
+                );
+            }
         }
     }
 }
